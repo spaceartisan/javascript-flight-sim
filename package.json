@@ -1,0 +1,1 @@
+{"name":"aeronaut-flight-simulator","version":"0.1.0","private":true,"type":"module","description":"A static 3D browser flight simulator with simulated aerodynamics and tactical missions","scripts":{"test":"node --check world.js && node --check sim.js && node --check main.js && node tests/validate.mjs","serve":"npx serve ."}}

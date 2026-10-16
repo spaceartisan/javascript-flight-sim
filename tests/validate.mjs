@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 const read=(p)=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8');
-const html=read('index.html'),main=read('main.js'),world=read('world.js'),sim=read('sim.js'),css=read('styles.css');
+const html=read('index.html'),main=read('main.js'),world=read('world.js'),sim=read('sim.js'),css=read('styles.css'),audio=read('audio.js');
 for(const f of ['main.js','sim.js','world.js','assets/mark.svg','assets/concrete.svg','tools/build-kestrel.py','tools/aeronaut-soundbank.csd'])assert(fs.existsSync(new URL('../'+f,import.meta.url)),'missing '+f);
 for(const id of [...main.matchAll(/\$\('([^']+)'\)/g)].map(m=>m[1])){
  assert(html.includes('id="'+id+'"'), 'UI element missing in index.html: '+id);
@@ -27,4 +27,24 @@ assert(html.includes('id="hudModeButton"')&&html.includes('hud hidden compact'),
 assert(main.includes("caution.dataset.warning=warning"),'single priority annunciator missing');
 assert(main.includes("e.code==='F2'"),'HUD toggle hotkey missing');
 assert(css.includes('.hud.compact .mission-panel')&&css.includes('.alerts.active'),'declutter styles missing');
-console.log('AERONAUT static validation passed (including depth & declutter regression checks).');
+// GeneralUser GS v2.0.3 asset and Web Audio integration regression checks.
+assert(main.includes("import {sound} from './audio.js'"), 'Web Audio bank must be connected to flight controls');
+assert(!main.includes('const sound={'),'Old standalone oscillator-only audio engine reintroduced');
+for(const entry of ['engine-core','afterburner','air-rush','contact-select','seeker-lock',
+                    'gear-action','missile-launch','impact','caution','mission-clear']){
+ const file=new URL('../assets/audio/'+entry+'.ogg', import.meta.url);
+ assert(fs.existsSync(file),'Missing GeneralUser audio sample '+entry);
+ const b=fs.readFileSync(file);
+ assert(b.toString('ascii',0,4)==='OggS','Not an Ogg file: '+entry);
+ assert(b.byteLength>5000,'Suspiciously small SF2 sample: '+entry);
+ assert(b.byteLength<200000,'Excessively large GitHub Pages sample: '+entry);
+ assert(audio.includes("'"+entry+"'"),'Audio bank missing cue: '+entry);
+}
+assert(audio.includes('decodeAudioData')&&audio.includes('new URL('),'Audio must load assets relative to the deployed module');
+assert(audio.includes('playbackRate.setTargetAtTime')&&audio.includes('filter.frequency.setTargetAtTime'),'Engine sample layers must respond to flight');
+assert(audio.includes('this.makeFallback()'),'Procedural fallback should remain for unsupported browsers');
+assert(sim.includes('effects.complete()')&&sim.includes('effects.gear()'),'Mission and gear sound triggers not connected');
+assert(html.includes('Toggle sound'),'Help must document mute action');
+assert(fs.existsSync(new URL('../tools/render-generaluser.py',import.meta.url)),'SF2 renderer source missing');
+assert(fs.existsSync(new URL('../assets/audio/README.md',import.meta.url)),'SoundFont attribution missing');
+console.log('AERONAUT static validation passed (including depth, HUD & GeneralUser GS audio checks).');

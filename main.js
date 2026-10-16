@@ -1,42 +1,8 @@
 import {THREE,V,UP,FWD,renderer,scene,camera,sky,aircraft,drones} from './world.js';
 import {flight,keys,effects,setStick,toggleGear,cycleFlaps,selectTarget,getTarget,targetSolution,fireMissile,updateMissiles,updateDrones,updateFlight,resetFlight} from './sim.js';
+import {sound} from './audio.js';
 const $=id=>document.getElementById(id);
 const clamp=THREE.MathUtils.clamp,KTS=1.943844,FT=3.28084,DEG=180/Math.PI;
-const sound={
- ctx:null,engine1:null,engine2:null,wind:null,filter:null,
- init(){
-  if(this.ctx)return;
-  const ctx=this.ctx=new (window.AudioContext||window.webkitAudioContext)();
-  const master=ctx.createGain();master.gain.value=.36;master.connect(ctx.destination);this.master=master;
-  const tone=(type,frequency,volume)=>{
-   const osc=ctx.createOscillator(),gain=ctx.createGain();
-   osc.type=type;osc.frequency.value=frequency;gain.gain.value=volume;osc.connect(gain).connect(master);osc.start();return {osc,gain};
-  };
-  this.engine1=tone('sawtooth',39,.0001);this.engine2=tone('triangle',83,.0001);
-  const buffer=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate),data=buffer.getChannelData(0);
-  for(let i=0;i<data.length;i++)data[i]=Math.random()*2-1;
-  const source=ctx.createBufferSource();source.buffer=buffer;source.loop=true;
-  const filter=ctx.createBiquadFilter();filter.type='lowpass';filter.frequency.value=260;
-  const wind=ctx.createGain();wind.gain.value=.0001;source.connect(filter).connect(wind).connect(master);source.start();
-  this.wind=wind;this.filter=filter;
- },
- update(){
-  if(!this.ctx)return;const t=this.ctx.currentTime,p=flight.spool,s=flight.airspeed;
-  this.engine1.osc.frequency.setTargetAtTime(33+p*79,t,.085);this.engine2.osc.frequency.setTargetAtTime(76+p*241,t,.085);
-  this.engine1.gain.gain.setTargetAtTime(.015+p*.13,t,.12);this.engine2.gain.gain.setTargetAtTime(.007+p*.085,t,.12);
-  this.wind.gain.setTargetAtTime(Math.min(.22,s/1000),t,.2);
-  this.filter.frequency.setTargetAtTime(250+s*6,t,.2);
- },
- chirp(freq=900,time=.15,type='sine',volume=.17){
-  if(!this.ctx)return;const ctx=this.ctx,o=ctx.createOscillator(),g=ctx.createGain(),t=ctx.currentTime;
-  o.type=type;o.frequency.setValueAtTime(freq,t);
-  o.frequency.exponentialRampToValueAtTime(Math.max(80,freq*.61),t+time);
-  g.gain.setValueAtTime(Math.max(.001,volume),t);g.gain.exponentialRampToValueAtTime(.001,t+time);
-  o.connect(g).connect(this.master);o.start(t);o.stop(t+time+.04);
- },
- boom(){this.chirp(110,.75,'sawtooth',.38);this.chirp(48,.95,'triangle',.3)},
- launch(){this.chirp(480,.42,'sawtooth',.25);this.chirp(1200,.19,'square',.08)}
-};
 let toastAt=0,lastAlert='',lastNotice='',cameraMode=0,uiTimer=0;
 const cameraModes=['CHASE','COCKPIT','WING','TOWER'],cameraFocus=V();
 function notify(message){
@@ -48,7 +14,14 @@ function notify(message){
  $('toast').classList.add('show');
  toastAt=now;
 }
-effects.notify=notify;effects.chirp=(...args)=>sound.chirp(...args);effects.boom=()=>sound.boom();effects.launch=()=>sound.launch();
+effects.notify=notify;
+effects.chirp=(...args)=>sound.chirp(...args);
+effects.boom=()=>sound.boom();
+effects.launch=()=>sound.launch();
+effects.gear=()=>sound.gear();
+effects.flap=()=>sound.flap();
+effects.select=()=>sound.select();
+effects.complete=()=>sound.complete();
 function cycleView(){cameraMode=(cameraMode+1)%4;notify('CAMERA / '+cameraModes[cameraMode]);$('cameraName').textContent=cameraModes[cameraMode]}
 function toggleHUD(){
  const compact=$('hud').classList.toggle('compact');
@@ -122,6 +95,7 @@ function updateHUD(){
  for(const [id,offset] of [['hdgLeft',-60],['hdgCenter',-30],['hdgRight',30],['hdgFar',60]])
   $(id).textContent=String(angle360(hdg+offset)).padStart(3,'0');
  const d=getTarget(),sol=targetSolution(d);flight.lock=sol.lock;
+ if(sol.lock)sound.lock();else sound.unlock();
  if(d){
   $('targetInfo').innerHTML='<span>CONTACT '+String(d.index+1).padStart(2,'0')+' / UAV</span><b>'+(sol.range/1000).toFixed(2)+' KM</b>';
   $('lockStatus').textContent=sol.lock?'● IR LOCK ACQUIRED':sol.angle<60?'SEEKER ALIGNING':'TARGET OUTSIDE FOV';
@@ -149,7 +123,7 @@ function updateHUD(){
   caution.textContent=warning;
   caution.classList.toggle('active',Boolean(warning));
  }
- if(warnings.length&&warnings[0]!==lastAlert){sound.chirp(760,.13);lastAlert=warnings[0]}
+ if(warnings.length&&warnings[0]!==lastAlert){sound.caution();lastAlert=warnings[0]}
  if(!warnings.length)lastAlert='';
  const secs=Math.floor(flight.clock);
  $('clock').textContent='12:'+String((48+Math.floor(secs/60))%60).padStart(2,'0')+':'+String(secs%60).padStart(2,'0')+' Z';
@@ -175,6 +149,7 @@ document.addEventListener('keydown',e=>{
  if(e.code==='KeyP'){flight.paused=!flight.paused;notify(flight.paused?'SIMULATION PAUSED':'SIMULATION RESUMED')}
  if(e.code==='KeyR'){flight.throttle=1;notify('AFTERBURNER SELECTED')}
  if(e.code==='KeyT'){flight.throttle=0;notify('THROTTLE IDLE')}
+ if(e.code==='KeyU'){notify(sound.mute()?'AUDIO MUTED':'AUDIO ENABLED')}
  if(e.code==='Tab'){selectTarget()}
  if(e.code==='KeyM'||e.code==='Enter')fireMissile();
  keys.add(e.code);
@@ -183,7 +158,7 @@ document.addEventListener('keyup',e=>keys.delete(e.code));
 addEventListener('blur',()=>{keys.clear();setStick(0,0)});
 $('startButton').addEventListener('click',()=>{
  flight.started=true;$('startScreen').classList.add('hidden');$('hud').classList.remove('hidden');
- sound.init();if(sound.ctx.state==='suspended')sound.ctx.resume();
+ sound.init();
  notify('SIERRA TOWER: KESTREL ONE, CLEARED FOR TAKEOFF');
 });
 $('helpButton').addEventListener('click',()=>$('helpScreen').classList.remove('hidden'));
@@ -225,7 +200,7 @@ function loop(now){
  }else{
   updateCamera(dt);uiTimer+=dt;
   if(uiTimer>.105){updateHUD();uiTimer=0}
-  sound.update();
+  sound.update(flight,cameraMode);
  }
  renderer.render(scene,camera);
  if(now-toastAt>2100)$('toast').classList.remove('show');

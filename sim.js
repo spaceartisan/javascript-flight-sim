@@ -6,21 +6,21 @@ export const flight={pos:V(0,2,1070),vel:V(),q:new THREE.Quaternion(),angular:V(
 gear:true,flaps:1,brake:false,assist:true,fuel:100,missiles:4,kills:0,score:0,
 airborne:false,crashed:false,paused:false,started:false,phase:'GROUND • READY',
 gload:1,aoa:0,airspeed:0,verticalSpeed:0,lock:false,selected:0,clock:0,missionDone:false,lastTouchdown:0};
-export const effects={notify:()=>{},chirp:()=>{},boom:()=>{},launch:()=>{}};
+export const effects={notify:()=>{},chirp:()=>{},boom:()=>{},launch:()=>{},gear:()=>{},flap:()=>{},select:()=>{},complete:()=>{}};
 export let mobileX=0,mobileY=0;
 export function setStick(x,y){mobileX=x;mobileY=y}
 export function toggleGear(){
  if(flight.crashed)return;
  if(flight.airspeed<3&&flight.pos.y<3){effects.notify('GEAR LOCKED — AIRCRAFT ON GROUND');return}
  flight.gear=!flight.gear;aircraft.userData.gear.visible=flight.gear;
- effects.notify(flight.gear?'LANDING GEAR DOWN & LOCKED':'LANDING GEAR RETRACTING');effects.chirp(370,.17);
+ effects.notify(flight.gear?'LANDING GEAR DOWN & LOCKED':'LANDING GEAR RETRACTING');effects.gear();
 }
-export function cycleFlaps(){flight.flaps=(flight.flaps+1)%3;effects.notify('FLAPS SET '+[0,12,25][flight.flaps]+'°');effects.chirp(540,.11)}
+export function cycleFlaps(){flight.flaps=(flight.flaps+1)%3;effects.notify('FLAPS SET '+[0,12,25][flight.flaps]+'°');effects.flap()}
 export function selectTarget(){
  const alive=drones.filter(d=>d.alive);if(!alive.length){effects.notify('NO CONTACTS REMAIN');return}
  const current=alive.findIndex(d=>d.index===flight.selected);
  flight.selected=alive[(current+1)%alive.length].index;
- effects.notify('RADAR CONTACT '+String(flight.selected+1).padStart(2,'0')+' SELECTED');effects.chirp(1000,.09);
+ effects.notify('RADAR CONTACT '+String(flight.selected+1).padStart(2,'0')+' SELECTED');effects.select();
 }
 export function getTarget(){
  let d=drones.find(d=>d.index===flight.selected&&d.alive);
@@ -152,7 +152,7 @@ export function updateFlight(dt){
    euler.x=clamp(euler.x,-.015,12*RAD);euler.z=lerp(euler.z,0,clamp(dt*5,0,1));flight.q.setFromEuler(euler);
    if(flight.kills===3&&landable&&Vmag<5&&!flight.missionDone){
     flight.missionDone=true;flight.phase='SORTIE COMPLETE';flight.score+=2000;
-    effects.notify('SORTIE COMPLETE — SIERRA, WELCOME HOME');effects.chirp(1250,.55);
+    effects.notify('SORTIE COMPLETE — SIERRA, WELCOME HOME');effects.complete();
    }
    if(Vmag<3&&flight.missiles<4){
     flight.missiles=4;for(const s of aircraft.userData.stores)s.model.visible=true;effects.notify('GROUND CREW — MISSILES REARMED');

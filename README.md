@@ -32,6 +32,7 @@ Three.js 0.168.0 is pinned via an import map and loaded from jsDelivr. An intern
 | Camera (chase/cockpit/wing/tower) | V |
 | Compact / detailed flight HUD | F2 |
 | Stability assist | C |
+| Toggle flight audio | U |
 | Pause | P |
 | Controls/help | H |
 | Restart after crash | Enter |
@@ -96,7 +97,29 @@ For the audio source use:
 csound -d -W -o assets-preview.wav tools/aeronaut-soundbank.csd
 ```
 
-The Blender export is a source-model development asset, not an in-game imported GLB in this revision. Web Audio handles procedural dynamic engine sounds, air rush, missile launch, warnings and explosions without downloadable sample assets.
+The Blender export is a source-model development asset, not an in-game imported GLB in this revision.
+
+### GeneralUser GS v2.0.3 sound upgrade (v0.1.2)
+
+The game's sounds now use **ten actual GeneralUser GS recordings rendered from the GeneralUser GS v2.0.3 SoundFont**, packaged as compact Ogg Vorbis assets in `assets/audio/`. FluidSynth renders the SoundFont instruments offline, and Web Audio performs adaptive playback in the browser. No 31 MB SF2 is downloaded at runtime.
+
+- **Engine:** sampled GeneralUser helicopter, polysynth and warm pad presets, with live pitch, filtering and gain driven by turbine spool.
+- **Afterburner:** GeneralUser sweep pad, atmosphere and helicopter layers; only rises audibly above 78% spool.
+- **Airflow:** GeneralUser seashore and helicopter layers, modulated by IAS, camera view and filtering.
+- **Systems:** GeneralUser glockenspiel/crystal selector, seeker-lock, woodblock/taiko gear/flap, and synth-lead caution cues.
+- **Combat:** GeneralUser gunshot/synth-drum/orchestral-hit missile launch and target impact cues.
+- **Sortie complete:** GeneralUser music-box and warm-pad victory motif.
+
+The procedural oscillators and noise remain intentionally **quiet**: they fill the broadband attack and smooth transitions and provide a fallback if loading or decoding an Ogg sample fails. Audio starts only on the player's **INITIATE FLIGHT** gesture. **U** toggles mute. All samples are static assets, served from relative URLs on GitHub Pages; `audio.js` preloads them asynchronously and degrades gracefully.
+
+To rerender from the actual SoundFont in `DEV_TOOLS/audio.zip`:
+
+```sh
+python3 tools/render-generaluser.py /path/to/GeneralUser-GS.sf2 assets/audio
+npm test
+```
+
+Requires Python 3, numpy, scipy, soundfile, and `libfluidsynth.so.3`. The generator and SoundFont license notes are kept in source control; the original SF2 is not bundled. See `assets/audio/README.md` for instruments and attribution.
 
 ## Validation
 

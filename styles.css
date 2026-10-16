@@ -3,3 +3,108 @@
 @media(max-width:1200px){.left-column{width:208px}.right-column{width:222px}.topcenter{display:none}.radar-panel #radar{width:180px}.data-cell{min-width:90px;padding:10px 12px}.data-cell strong{font-size:30px}.footerbar>div:last-child{display:none}}
 @media(max-width:820px){.topbar{top:8px;left:8px;right:8px;height:51px;padding:0 10px}.brand{min-width:0}.brand-icon{width:30px;height:30px;font-size:21px}.brand b{font-size:17px}.brand small{display:none}.topclock,.topactions button:last-child{display:none}.flight-data{top:69px;left:8px}.data-cell{min-width:70px;padding:8px}.data-cell strong{font-size:23px}.data-cell small{font-size:8px}.heading-tape{top:142px;width:260px;font-size:10px}.heading-tape strong{font-size:15px}.left-column{left:8px;bottom:85px;width:150px}.right-column{right:8px;bottom:85px;width:166px}.radar-panel,.mission-panel,.weapons-panel,.systems-panel{padding:9px}.radar-panel #radar{width:126px;margin:4px auto}.mission-panel{display:none}.systems-panel{display:none}.panel-title{font-size:9px}.weapon-main{gap:5px;margin:7px 0}.weapon-symbol{width:30px;height:40px;font-size:21px}.weapon-main strong{font-size:15px}.weapon-main span{font-size:8px}.target-info{font-size:8px}.weapon-tip{display:none}.footerbar{display:none}.hud-low{bottom:52px;width:90%;justify-content:center;white-space:nowrap;font-size:9px}.attitude{width:300px;height:320px}.intro-shell{margin:0 25px}.intro-shell h1{font-size:clamp(70px,17vw,130px);margin:34px 0 20px}.intro-features{gap:10px;flex-wrap:wrap;margin:25px 0}.intro-features span{font-size:8px}.intro-sidebar{display:none}.help-sheet{padding:25px}.help-sheet h2{font-size:46px}.help-grid{grid-template-columns:1fr;gap:3px}.help-grid p{margin:5px 0}.mobile{display:flex;position:fixed;z-index:5;bottom:9px;left:12px;right:12px;justify-content:space-between;pointer-events:none}.mobile button,.mobile input,.stick-zone{pointer-events:auto;touch-action:none}.stick-zone{width:140px;height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:.79}.stick-zone>span{font:9px DM Mono;color:white}.stick-ring{width:107px;height:107px;border:1px solid rgba(166,255,208,.55);border-radius:50%;display:grid;place-items:center;background:rgba(8,24,33,.4)}#stickKnob{width:43px;height:43px;border-radius:50%;border:2px solid var(--hi);background:rgba(105,239,195,.25)}.mobile-right{display:flex;flex-direction:column;align-items:flex-end;gap:7px}.mobile-right button{background:rgba(8,31,39,.75);border:1px solid rgba(132,245,200,.7);color:#d7ffed;font:10px DM Mono;padding:8px}.mobile-right>#mobileFire{font-size:14px;background:rgba(170,52,35,.7);border-color:#ffa78d;min-width:82px;min-height:46px}.mobile-actions{display:flex;gap:4px}.mobile-right label{font:9px DM Mono;color:#c9f8df;background:rgba(4,20,28,.7);padding:8px}.mobile-right input{width:135px;accent-color:var(--hi)}.flight-data{opacity:.85}}
 @media(max-height:710px){.mission-panel{display:none}.left-column,.right-column{bottom:73px}.intro-shell h1{margin:25px 0;font-size:min(14vh,150px)}.intro-features{margin:24px 0}.intro-bottom{margin-top:16px}}
+
+
+/* v0.1.1 — Flight-deck decluttering.
+   Primary flight data stays readable while reference panels remain optional. */
+.hud.compact .topbar{
+ top:12px;left:16px;right:16px;height:52px;
+ background:rgba(6,20,30,.60);box-shadow:none;
+ border-color:rgba(173,211,219,.12);
+}
+.hud.compact .brand-icon{width:33px;height:33px;font-size:23px}
+.hud.compact .brand b{font-size:19px}
+.hud.compact .brand small{font-size:8px}
+.hud.compact .topcenter,.hud.compact .topclock{display:none}
+.hud.compact .topactions button{padding:8px 11px;background:rgba(12,37,45,.68);border-color:rgba(165,206,211,.24)}
+.hud.compact .flight-data{
+ top:74px;left:16px;
+ background:rgba(6,20,30,.57);box-shadow:none;
+ border-color:rgba(173,211,219,.11);
+}
+.hud.compact .data-cell{min-width:90px;padding:9px 12px}
+.hud.compact .data-cell strong{font-size:27px}
+.hud.compact .data-cell small{font-size:9px}
+.hud.compact .heading-tape{top:98px}
+.hud.compact .mission-panel,.hud.compact .systems-panel,
+.hud.compact .footerbar,.hud.compact .hud-low span+span{display:none}
+.hud.compact .left-column{bottom:17px;left:16px;width:206px}
+.hud.compact .right-column{bottom:17px;right:16px;width:229px}
+.hud.compact .radar-panel,.hud.compact .weapons-panel{background:rgba(6,20,30,.62);box-shadow:none}
+.hud.compact #radar{width:168px;height:auto;margin:7px auto}
+.hud.compact .hud-low{bottom:27px}
+.hud.compact .weapon-tip{display:none}
+.hud.compact .weapon-main{margin:9px 0}
+.hud.compact .weapon-symbol{width:48px;height:48px;font-size:29px}
+.hud.compact .weapon-main strong{font-size:20px}
+.hud.compact .weapon-main small{font-size:8px}
+
+/* Critical warnings live in one stable annunciator, not stacked floating banners. */
+.alerts{
+ min-height:0;top:161px;gap:0;
+ width:auto;max-width:min(480px,66vw);
+ color:#ffdbbf;text-align:center;
+ font:600 11px/1.5 'DM Mono',monospace;
+ letter-spacing:.08em;
+ text-shadow:0 1px 6px #241008;
+ border:0;
+ pointer-events:none;
+}
+.alerts.active{
+ padding:7px 16px;
+ background:rgba(71,26,22,.78);
+ border:1px solid rgba(244,146,110,.45);
+ border-left:3px solid #f5a47b;
+}
+.alerts:not(.active){display:none}
+
+/* One brief, unobtrusive radio notice; no central pop-up stacks. */
+.toast{
+ top:171px;bottom:auto;left:auto;right:18px;
+ width:max-content;max-width:min(300px,34vw);
+ padding:9px 12px;
+ transform:translateY(-5px);
+ color:#c0f9db;
+ background:rgba(7,26,30,.85);
+ border:1px solid rgba(109,187,163,.4);
+ text-align:left;
+ font:10px/1.5 'DM Mono',monospace;
+ letter-spacing:.03em;
+ box-shadow:none;
+}
+.toast.show{transform:translateY(0)}
+@media(max-width:1200px){
+ .hud.compact .topbar{left:10px;right:10px}
+ .hud.compact .flight-data{left:10px}
+ .hud.compact .left-column{left:10px;width:174px}
+ .hud.compact .right-column{right:10px;width:198px}
+ .hud.compact #radar{width:145px}
+}
+@media(max-width:820px){
+ .hud.compact .topbar{top:7px;left:7px;right:7px;height:47px}
+ .hud.compact .brand{gap:7px}
+ .hud.compact .brand-icon{width:26px;height:26px;font-size:20px}
+ .hud.compact .brand b{font-size:16px}
+ .hud.compact .topactions{gap:4px}
+ .hud.compact .topactions button{padding:8px 6px;font-size:9px}
+ .hud.compact .topactions #viewButton span{display:none}
+ .hud.compact .flight-data{top:62px;left:7px}
+ .hud.compact .data-cell{min-width:66px;padding:7px}
+ .hud.compact .data-cell strong{font-size:21px}
+ .hud.compact .data-cell small{font-size:8px}
+ .hud.compact .heading-tape{top:127px}
+ .hud.compact .left-column{left:7px;bottom:165px;width:126px}
+ .hud.compact .right-column{right:7px;bottom:165px;width:145px}
+ .hud.compact .radar-panel,.hud.compact .weapons-panel{padding:7px}
+ .hud.compact #radar{width:108px}
+ .hud.compact .weapon-symbol{width:26px;height:35px;font-size:19px}
+ .hud.compact .weapon-main strong{font-size:14px}
+ .hud.compact .weapon-main span{font-size:8px}
+ .hud.compact .hud-low{bottom:139px;font-size:9px}
+ .alerts{top:149px;max-width:75vw;font-size:10px}
+ .toast{top:147px;right:7px;max-width:47vw;font-size:9px}
+}
+@media(max-height:660px) and (min-width:821px){
+ .hud.compact .left-column,.hud.compact .right-column{bottom:11px}
+ .hud.compact .hud-low{bottom:15px}
+}

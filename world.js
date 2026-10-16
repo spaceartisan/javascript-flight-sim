@@ -3,19 +3,19 @@ export {THREE};
 export const V=(x=0,y=0,z=0)=>new THREE.Vector3(x,y,z);
 export const UP=V(0,1,0), FWD=V(0,0,-1);
 export const canvas=document.getElementById('sim');
-export const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
+export const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance',logarithmicDepthBuffer:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.8));renderer.setSize(innerWidth,innerHeight);
 renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.3;
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 export const scene=new THREE.Scene();scene.background=new THREE.Color('#a2c3d7');scene.fog=new THREE.FogExp2('#a4beca',.000064);
-export const camera=new THREE.PerspectiveCamera(69,innerWidth/innerHeight,.1,45000);
+export const camera=new THREE.PerspectiveCamera(69,innerWidth/innerHeight,.6,26000);
 scene.add(new THREE.HemisphereLight(0xc3e9ff,0x826951,2.1));
 export const sun=new THREE.DirectionalLight(0xffe3b6,3);
 sun.position.set(-4200,6500,-5200);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);
 sun.shadow.camera.left=-300;sun.shadow.camera.right=300;sun.shadow.camera.top=300;sun.shadow.camera.bottom=-300;
 sun.shadow.camera.near=1;sun.shadow.camera.far=12000;sun.shadow.bias=-.00016;scene.add(sun);scene.add(sun.target);
 export const sky=new THREE.Mesh(new THREE.SphereGeometry(19000,28,18),new THREE.ShaderMaterial({
-side:THREE.BackSide,depthWrite:false,fog:false,
+side:THREE.BackSide,depthWrite:false,depthTest:false,fog:false,
 vertexShader:'varying vec3 dir;void main(){dir=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
 fragmentShader:'varying vec3 dir;void main(){float h=clamp(dir.y*.55+.5,0.,1.);vec3 c=mix(vec3(.82,.79,.67),vec3(.19,.46,.73),smoothstep(.17,.93,h));c=mix(vec3(.90,.70,.50),c,smoothstep(0.,.26,h));float s=pow(max(dot(normalize(dir),normalize(vec3(-.38,.48,-.72))),0.),155.);c+=vec3(1.,.65,.3)*s*.72;gl_FragColor=vec4(c,1.);}'
 }));sky.frustumCulled=false;scene.add(sky);
@@ -23,8 +23,11 @@ export const mat=(c,metal=.08,rough=.82)=>new THREE.MeshStandardMaterial({color:
 const steel=mat('#788d96',.72,.37),panel=mat('#53666e',.65,.47),edge=mat('#a5bac1',.76,.24),dark=mat('#1f343d',.59,.54);
 const runwayTexture=new THREE.TextureLoader().load('./assets/concrete.svg');
 runwayTexture.colorSpace=THREE.SRGBColorSpace;runwayTexture.wrapS=THREE.RepeatWrapping;runwayTexture.wrapT=THREE.RepeatWrapping;runwayTexture.repeat.set(3,30);
-const asphalt=new THREE.MeshStandardMaterial({color:'#515d60',map:runwayTexture,roughness:.94});
+const asphalt=new THREE.MeshStandardMaterial({color:'#515d60',map:runwayTexture,roughness:.94,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-2});
 const concrete=mat('#758487'),white=mat('#d5ddd4'),yellow=mat('#dcc58b'),red=mat('#bd5a40');
+const runwayPaint=white.clone();runwayPaint.polygonOffset=true;runwayPaint.polygonOffsetFactor=-2;runwayPaint.polygonOffsetUnits=-3;
+const runwayEdge=mat('#6b7772');runwayEdge.polygonOffset=true;runwayEdge.polygonOffsetFactor=-1;runwayEdge.polygonOffsetUnits=-2;
+const taxiConcrete=concrete.clone();taxiConcrete.polygonOffset=true;taxiConcrete.polygonOffsetFactor=-1;taxiConcrete.polygonOffsetUnits=-2;
 export function box(parent,w,h,d,material,x=0,y=0,z=0){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);m.position.set(x,y,z);m.castShadow=h>.4;m.receiveShadow=true;parent.add(m);return m}
 function hash(x,z){const a=Math.sin(x*127.1+z*311.7)*43758.5453;return a-Math.floor(a)}
 function noise(x,z){const X=Math.floor(x),Z=Math.floor(z),u=x-X,t=z-Z,a=u*u*(3-2*u),b=t*t*(3-2*t);return THREE.MathUtils.lerp(THREE.MathUtils.lerp(hash(X,Z),hash(X+1,Z),a),THREE.MathUtils.lerp(hash(X,Z+1),hash(X+1,Z+1),a),b)}
@@ -47,13 +50,17 @@ terrain.receiveShadow=true;scene.add(terrain);
 const sea=new THREE.Mesh(new THREE.PlaneGeometry(30000,36000),new THREE.MeshPhysicalMaterial({color:'#427789',metalness:.23,roughness:.35,transparent:true,opacity:.94}));
 sea.rotation.x=-Math.PI/2;sea.position.set(-22000,-18,0);scene.add(sea);
 const airport=new THREE.Group();scene.add(airport);
-box(airport,65,.08,2700,asphalt,0,.045,0);box(airport,245,.09,600,concrete,205,.05,700);
-box(airport,165,.09,55,concrete,94,.052,560);box(airport,165,.09,55,concrete,94,.052,-380);
-for(const side of [-1,1]){box(airport,9,.055,2700,mat('#6b7772'),side*39,.054,0);
-for(let i=-1250;i<=1250;i+=100)box(airport,.35,.02,38,white,side*28,.102,i);
+// Deliberately separated elevations: terrain < apron < runway < taxiway.
+// Taxi links terminate at the runway shoulder instead of overlapping the runway mesh.
+box(airport,65,.10,2700,asphalt,0,.065,0);
+box(airport,245,.12,600,concrete,205,.06,700);
+box(airport,171,.10,55,taxiConcrete,121,.135,560);
+box(airport,171,.10,55,taxiConcrete,121,.135,-380);
+for(const side of [-1,1]){box(airport,9,.055,2700,runwayEdge,side*39,.09,0);
+for(let i=-1250;i<=1250;i+=100)box(airport,.35,.02,38,runwayPaint,side*28,.14,i);
 for(let i=-1200;i<=1200;i+=75){const light=box(airport,.8,.24,.8,new THREE.MeshBasicMaterial({color:i>0?'#fff1bc':'#b9e8ff'}),side*36,.28,i);light.castShadow=false}
-for(let j=0;j<6;j++){box(airport,2.5,.012,53,white,side*(4+j*3),.11,1165);box(airport,2.5,.012,53,white,side*(4+j*3),.11,-1165)}}
-for(let i=-1225;i<=1225;i+=70)box(airport,1.35,.012,30,white,0,.103,i);
+for(let j=0;j<6;j++){box(airport,2.5,.012,53,runwayPaint,side*(4+j*3),.14,1165);box(airport,2.5,.012,53,runwayPaint,side*(4+j*3),.14,-1165)}}
+for(let i=-1225;i<=1225;i+=70)box(airport,1.35,.012,30,runwayPaint,0,.14,i);
 for(let i=0;i<5;i++){const z=970-i*190;box(airport,85,25,96,concrete,380,12.55,z);box(airport,91,4,103,panel,380,27,z);
 box(airport,60,19,1,dark,380,10,z-48.2);for(let j=0;j<5;j++)box(airport,1,18,1,edge,352+j*14,10,z-48.8)}
 const glass=mat('#263f50',.55,.31);
@@ -61,12 +68,20 @@ box(airport,30,40,28,concrete,585,20,-85);box(airport,14,77,14,concrete,585,38.5
 box(airport,30,9,30,glass,585,82,-85);box(airport,2,19,2,edge,585,96,-85);
 for(let i=0;i<30;i++){const x=400+(i%7)*110,z=-700+Math.floor(i/7)*150,h=11+hash(i,8)*35;
 box(airport,12+hash(i,4)*11,h,14+hash(i,2)*14,hash(i,5)>.5?concrete:panel,x,h/2,z)}
-const cloudMat=new THREE.MeshLambertMaterial({color:'#ffffff',transparent:true,opacity:.49,depthWrite:false});
-for(let i=0;i<48;i++){const group=new THREE.Group(),s=65+hash(i,61)*95;
-for(let k=0;k<7;k++){const m=new THREE.Mesh(new THREE.IcosahedronGeometry(1,1),cloudMat);
-m.scale.set(s*(.85+hash(k,3)*.9),s*(.24+hash(k,2)*.26),s*(.55+hash(k,5)));
-m.position.set((k-3)*s*.48,(hash(k,7)-.4)*s*.18,(hash(k,9)-.5)*s);group.add(m)}
-group.position.set((hash(i,50)-.5)*25000,1150+hash(i,33)*1500,(hash(i,99)-.5)*24000);scene.add(group)}
+// Sparse, rounded cloud clusters replace the repeated flat billboard-like ribbons.
+const cloudGeometry=new THREE.SphereGeometry(1,10,7);
+const cloudMat=new THREE.MeshLambertMaterial({color:'#e9f5f7',transparent:true,opacity:.27,depthWrite:false,side:THREE.FrontSide});
+for(let i=0;i<22;i++){
+ const group=new THREE.Group(),s=65+hash(i,61)*80;
+ for(let k=0;k<5;k++){
+  const m=new THREE.Mesh(cloudGeometry,cloudMat);
+  m.scale.set(s*(.7+hash(k,i+3)*.6),s*(.38+hash(k,i+11)*.35),s*(.56+hash(k,i+27)*.62));
+  m.position.set((k-2)*s*.77,(hash(k,i+7)-.4)*s*.22,(hash(k,i+9)-.5)*s*.55);
+  group.add(m);
+ }
+ group.position.set((hash(i,50)-.5)*23000,1600+hash(i,33)*1350,(hash(i,99)-.5)*22000);
+ scene.add(group);
+}
 function poly(parent,points,material,thickness=.14){const s=new THREE.Shape();s.moveTo(points[0][0],points[0][1]);for(let i=1;i<points.length;i++)s.lineTo(points[i][0],points[i][1]);s.closePath();
 const g=new THREE.ExtrudeGeometry(s,{depth:thickness,bevelEnabled:true,bevelThickness:.04,bevelSize:.06,bevelSegments:1});
 g.rotateX(Math.PI/2);g.translate(0,thickness*.5,0);const m=new THREE.Mesh(g,material);m.castShadow=true;parent.add(m);return m}

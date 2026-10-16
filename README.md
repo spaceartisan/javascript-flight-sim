@@ -30,12 +30,19 @@ Three.js 0.168.0 is pinned via an import map and loaded from jsDelivr. An intern
 | Target selection | Tab |
 | Launch locked RAZOR-9 missile | M or Enter |
 | Camera (chase/cockpit/wing/tower) | V |
+| Compact / detailed flight HUD | F2 |
 | Stability assist | C |
 | Pause | P |
 | Controls/help | H |
 | Restart after crash | Enter |
 
 Mobile view includes a touch flight-control stick, throttle slider, missile button and gear/flaps/camera buttons. For a complete takeoff and landing, keyboard controls on desktop are recommended.
+
+### Flight-deck presentation (v0.1.1)
+
+The default **Compact HUD** leaves essential speed/altitude/heading/G, attitude, target tracking, radar and weapons on screen without persistent side banners or a keyboard legend. Press **F2**, or use **FULL HUD** in the top-right, to expand the mission panel, system readouts, keyboard help bar and other details.
+
+Warnings use a **single priority annunciator** instead of stacking banners, and transient radio notices fade quickly. The airfield has explicit pavement layer heights, non-overlapping taxiway/runway geometry and polygon depth bias for painted markings. Long-range scenes use logarithmic depth buffering to reduce terrain/pavement flicker. Clouds have fewer, more rounded clusters.
 
 ### First flight
 

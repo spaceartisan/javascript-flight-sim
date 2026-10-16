@@ -37,11 +37,24 @@ const sound={
  boom(){this.chirp(110,.75,'sawtooth',.38);this.chirp(48,.95,'triangle',.3)},
  launch(){this.chirp(480,.42,'sawtooth',.25);this.chirp(1200,.19,'square',.08)}
 };
-let toastAt=0,lastAlert='',cameraMode=0,uiTimer=0;
+let toastAt=0,lastAlert='',lastNotice='',cameraMode=0,uiTimer=0;
 const cameraModes=['CHASE','COCKPIT','WING','TOWER'],cameraFocus=V();
-function notify(message){$('toast').textContent=message;$('toast').classList.add('show');toastAt=performance.now()}
+function notify(message){
+ const now=performance.now();
+ // Avoid filling the view with repeated warnings or short-lived messages.
+ if(lastNotice===message&&now-toastAt<2200)return;
+ lastNotice=message;
+ $('toast').textContent=message;
+ $('toast').classList.add('show');
+ toastAt=now;
+}
 effects.notify=notify;effects.chirp=(...args)=>sound.chirp(...args);effects.boom=()=>sound.boom();effects.launch=()=>sound.launch();
 function cycleView(){cameraMode=(cameraMode+1)%4;notify('CAMERA / '+cameraModes[cameraMode]);$('cameraName').textContent=cameraModes[cameraMode]}
+function toggleHUD(){
+ const compact=$('hud').classList.toggle('compact');
+ $('hudModeButton').textContent=compact?'▣ FULL HUD':'▤ COMPACT HUD';
+ notify(compact?'COMPACT HUD / F2 TO EXPAND':'FULL INSTRUMENTS / F2 TO COMPACT');
+}
 function updateCamera(dt){
  const q=flight.q,pos=flight.pos,desired=new THREE.Vector3(),focus=pos.clone();
  if(cameraMode===0){desired.copy(pos).add(V(0,6,27).applyQuaternion(q));focus.add(V(0,1.4,-26).applyQuaternion(q))}
@@ -128,7 +141,14 @@ function updateHUD(){
   if(flight.fuel<15)warnings.push('LOW FUEL');
   if(flight.gload>7)warnings.push('HIGH G LOAD');
  }
- $('alerts').innerHTML=warnings.map(w=>'<div class="alert">'+w+'</div>').join('');
+ // The caution area is a single priority annunciator, never a stack of banners.
+ const warning=warnings[0]||'';
+ const caution=$('alerts');
+ if(caution.dataset.warning!==warning){
+  caution.dataset.warning=warning;
+  caution.textContent=warning;
+  caution.classList.toggle('active',Boolean(warning));
+ }
  if(warnings.length&&warnings[0]!==lastAlert){sound.chirp(760,.13);lastAlert=warnings[0]}
  if(!warnings.length)lastAlert='';
  const secs=Math.floor(flight.clock);
@@ -147,6 +167,7 @@ document.addEventListener('keydown',e=>{
  }
  if(!flight.started)return;
  if(e.code==='Enter'&&flight.crashed){resetFlight();notify('NEW SORTIE — AIRCRAFT RESET');return}
+ if(e.code==='F2'){e.preventDefault();toggleHUD()}
  if(e.code==='KeyG')toggleGear();
  if(e.code==='KeyF')cycleFlaps();
  if(e.code==='KeyV')cycleView();
@@ -168,6 +189,7 @@ $('startButton').addEventListener('click',()=>{
 $('helpButton').addEventListener('click',()=>$('helpScreen').classList.remove('hidden'));
 $('closeHelp').addEventListener('click',()=>$('helpScreen').classList.add('hidden'));
 $('viewButton').addEventListener('click',cycleView);
+$('hudModeButton').addEventListener('click',toggleHUD);
 $('mobileFire').addEventListener('click',fireMissile);
 $('mobileGear').addEventListener('click',toggleGear);
 $('mobileFlaps').addEventListener('click',cycleFlaps);
@@ -206,6 +228,6 @@ function loop(now){
   sound.update();
  }
  renderer.render(scene,camera);
- if(now-toastAt>3500)$('toast').classList.remove('show');
+ if(now-toastAt>2100)$('toast').classList.remove('show');
 }
 requestAnimationFrame(loop);

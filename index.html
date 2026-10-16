@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#08121c"><meta name="description" content="AERONAUT / Tactical flight simulator: fly, land and engage.">
+<title>AERONAUT — Tactical Flight Simulator</title>
+<link rel="icon" type="image/svg+xml" href="./assets/mark.svg">
+<link rel="stylesheet" href="./styles.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.168.0/build/three.module.js"}}</script>
+</head>
+<body>
+<canvas id="sim" aria-label="3D flight simulator"></canvas>
+<div class="vignette"></div><div class="grain"></div>
+<div id="hud" class="hud hidden">
+ <header class="topbar glass">
+  <div class="brand"><div class="brand-icon">A<span>✦</span></div><div><b>AERONAUT</b><small>TACTICAL FLIGHT SYSTEMS <em>/</em> FLIGHT 01</small></div></div>
+  <div class="topcenter"><span class="state-dot"></span><span id="mode">FREE FLIGHT</span><i></i><span id="location">SIERRA NAVAL AIR STATION</span></div>
+  <div class="topactions"><span class="topclock" id="clock">12:48:00 Z</span><button id="viewButton" title="Change camera (V)">◉ <span id="cameraName">CHASE</span></button><button id="helpButton" title="Controls (H)">? HELP</button></div>
+ </header>
+ <div class="flight-data glass"><div class="data-cell"><small>IAS <sup>KT</sup></small><strong id="speed">000</strong><div class="data-bar"><span id="speedBar"></span></div></div><div class="data-cell"><small>ALT <sup>FT</sup></small><strong id="alt">00000</strong><small id="vsi" class="datum-sub">V/S +0000</small></div><div class="data-cell"><small>HDG <sup>MAG</sup></small><strong id="heading">360°</strong><small id="wind">WIND 240/08</small></div><div class="data-cell"><small>G FORCE</small><strong id="gforce">+1.0</strong><small id="aoa">AOA 0.0°</small></div></div>
+ <div id="flightHud" class="flight-hud">
+  <div id="headingTape" class="heading-tape"><span id="hdgLeft">300</span><span id="hdgCenter">330</span><strong id="hdgCurrent">360</strong><span id="hdgRight">030</span><span id="hdgFar">060</span></div>
+  <div id="attitude" class="attitude"><div id="horizon" class="horizon"><div class="skyshade"></div><div class="groundshade"></div><div class="horizon-line"></div><div class="pitch-line p20">20</div><div class="pitch-line p10">10</div><div class="pitch-line m10">-10</div><div class="pitch-line m20">-20</div></div><div class="flight-reference"><span class="left-wing"></span><span class="flight-box"></span><span class="right-wing"></span></div><div class="pitch-circle"></div><div id="flightPath" class="flight-path">◎</div></div>
+  <div class="flight-center"><div class="crosshair"><span></span><span></span><b>+</b></div><div id="aimReadout">● FLIGHT PATH</div></div>
+  <div class="hud-low"><span id="flightPhase">GROUND • READY</span><span id="horizonStatus">NAV / STRAIGHT & LEVEL</span></div>
+ </div>
+ <div class="left-column">
+  <section class="glass radar-panel"><div class="panel-title">TACTICAL RADAR <span id="radarScale">10 NM</span></div><canvas id="radar" width="260" height="260"></canvas><div class="radar-foot"><span id="contacts">03 CONTACTS</span><span>RWS / ACTIVE</span></div></section>
+  <section class="glass mission-panel"><div class="panel-title">MISSION CONTROL <span class="micro-status">LIVE</span></div><p id="objective">Depart Sierra, intercept the drones, and return for a safe landing.</p><div class="mission-progress"><i id="progressFill"></i></div><div class="mission-stats"><span>HOSTILES <b id="hostiles">03</b></span><span>DESTROYED <b id="kills">00</b></span></div></section>
+ </div>
+ <div class="right-column">
+  <section class="glass weapons-panel"><div class="panel-title">WEAPON SYSTEM <span id="weaponState" class="micro-status">STANDBY</span></div><div class="weapon-main"><div class="weapon-symbol">◇</div><div><small>ACTIVE STORES</small><strong>RAZOR-9 <sup>IR</sup></strong><span id="ammo">04 / 04 MISSILES</span></div></div><div id="targetInfo" class="target-info"><span>NO TARGET SELECTED</span><b>— — —</b></div><div id="lockStatus" class="lock-status">SEEKER COOLING</div><div class="weapon-tip">TAB SELECT TARGET <span>·</span> M FIRE</div></section>
+  <section class="glass systems-panel"><div class="panel-title">AIRCRAFT SYSTEMS <span class="micro-status">F-27 KESTREL</span></div><div class="systems-row"><span>ENG 1 <small id="engineN1">00%</small></span><div class="rail"><i id="engineBar"></i></div></div><div class="systems-row"><span>FUEL <small id="fuelText">100%</small></span><div class="rail"><i id="fuelBar"></i></div></div><div class="system-badges"><div id="gearBadge">GEAR <b>DOWN</b></div><div id="flapsBadge">FLAPS <b>0°</b></div><div id="brakeBadge">BRAKE <b>OFF</b></div></div></section>
+ </div>
+ <div id="alerts" class="alerts"></div>
+ <footer class="footerbar glass"><div><span class="legend">W / S</span> PITCH <span class="legend">A / D</span> ROLL <span class="legend">Q / E</span> RUDDER <span class="legend">SHIFT / CTRL</span> THROTTLE</div><div><span class="legend">G</span> GEAR <span class="legend">F</span> FLAPS <span class="legend">SPACE</span> BRAKE <span class="legend">M</span> FIRE <span class="legend">V</span> VIEW</div></footer>
+</div>
+<div id="startScreen" class="overlay"><div class="overglow"></div><div class="intro-shell"><div class="intro-eyebrow"><span class="state-dot"></span> AERONAUT DIVISION <span class="hairline"></span> FLIGHT SIMULATION</div><h1>THE SKY<br>IS <i>YOURS.</i></h1><p class="intro-lead">A precision-driven tactical flight experience.<br>Light the afterburner. Own the runway. Control the engagement.</p><div class="intro-features"><span><b>01</b> FLIGHT DYNAMICS</span><span><b>02</b> TACTICAL COMBAT</span><span><b>03</b> FULL INSTRUMENTATION</span></div><div class="intro-bottom"><button id="startButton" class="primary">INITIATE FLIGHT <span>↗</span></button><div><b>F-27 KESTREL</b><small>SIERRA NAVAL AIR STATION <em>—</em> RUNWAY 36</small></div></div></div><div class="intro-sidebar"><div class="side-number">01 <span>/ 03</span></div><div class="side-rule"></div><span>TACTICAL AVIATION<br>TRAINING OPERATIONS</span></div></div>
+<div id="helpScreen" class="modal hidden"><div class="help-sheet glass"><button id="closeHelp" class="x">✕</button><div class="intro-eyebrow">PILOT OPERATIONS MANUAL <span class="hairline"></span> REV. 1</div><h2>FLIGHT CONTROLS</h2><div class="help-grid"><div><h3>FLIGHT</h3><p><kbd>W</kbd> / <kbd>↑</kbd> Pitch nose down</p><p><kbd>S</kbd> / <kbd>↓</kbd> Pitch nose up</p><p><kbd>A</kbd> / <kbd>D</kbd> Roll left / right</p><p><kbd>Q</kbd> / <kbd>E</kbd> Rudder left / right</p><p><kbd>Shift</kbd> / <kbd>Ctrl</kbd> Increase / decrease throttle</p><p><kbd>R</kbd> Full afterburner <kbd>T</kbd> Idle</p></div><div><h3>AIRCRAFT</h3><p><kbd>G</kbd> Landing gear toggle</p><p><kbd>F</kbd> Flaps (0° / 12° / 25°)</p><p><kbd>Space</kbd> Wheel brakes (hold)</p><p><kbd>V</kbd> Camera mode</p><p><kbd>C</kbd> Flight stability assist</p><p><kbd>P</kbd> Pause simulation</p></div><div><h3>COMBAT & MISSION</h3><p><kbd>Tab</kbd> Next radar target</p><p><kbd>M</kbd> / <kbd>Enter</kbd> Launch missile</p><p>Acquire a target within 5 km and inside your forward seeker cone. Wait for the green LOCK indicator before firing.</p><p>Destroy three drones, then return and stop on the runway for rearm and mission completion.</p></div></div><div class="hint">TAKEOFF: HOLD SHIFT TO INCREASE THROTTLE · AT 145–165 KT, GENTLY HOLD S TO ROTATE · RAISE GEAR WHEN AIRBORNE</div></div></div>
+<div id="mobile" class="mobile"><div id="stickZone" class="stick-zone"><div class="stick-ring"><div id="stickKnob"></div></div><span>FLIGHT CONTROL</span></div><div class="mobile-right"><button id="mobileFire">FIRE</button><div class="mobile-actions"><button id="mobileGear">GEAR</button><button id="mobileFlaps">FLAPS</button><button id="mobileView">VIEW</button></div><label>THRUST <input id="mobileThrottle" type="range" min="0" max="100" value="0"></label></div></div>
+<div id="toast" class="toast" role="status"></div>
+<script type="module" src="./main.js"></script>
+</body>
+</html>

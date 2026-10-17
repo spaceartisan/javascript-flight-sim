@@ -44,6 +44,10 @@ async function testMode(name,viewport,isMobile){
       contactDisplay:contact.display,radarHidden:getComputedStyle(document.querySelector('.hud .left-column')).display==='none'};
    });
    assert(cockpit.height<215,name+' control dock exceeds screen-space budget: '+JSON.stringify(cockpit));
+   if(viewport.height>viewport.width){
+    const telemetryWidth=await page.locator('.flight-data').evaluate(el=>el.getBoundingClientRect().width);
+    assert(telemetryWidth<235,name+' portrait flight-data panel covers sky: '+telemetryWidth);
+   }
    assert(cockpit.contactDisplay!=='none',name+' compact targeting strip hidden');
    assert(cockpit.radarHidden,name+' full-size radar visible before requested');
    await page.locator('#mobileRadar').click();

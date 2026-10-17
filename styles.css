@@ -421,3 +421,16 @@
   background:rgba(5,22,30,.63);padding:7px 9px;
  }
 }
+
+/* v0.6 screenshot refinement — don't let an old portrait flex rule expand telemetry. */
+@media(max-width:980px), (pointer:coarse){
+ .mobile-v2 .flight-control-caption{display:none}
+}
+@media(max-width:650px) and (orientation:portrait){
+ .hud.compact .flight-data{
+  width:auto;right:auto;justify-content:flex-start;max-width:none;
+  background:rgba(4,22,31,.38);border-color:rgba(172,231,210,.10);
+ }
+ .hud.compact .data-cell{flex:0 0 auto;min-width:70px;max-width:88px;padding:6px 8px}
+ .hud.compact .mini-status{right:9px;top:12px;background:transparent}
+}

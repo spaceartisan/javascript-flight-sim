@@ -18,6 +18,10 @@ async function testMode(name,viewport,isMobile){
   // Main menu is the real PS2-era console operations terminal, not a web hero page.
   await page.locator('#startScreen').waitFor({state:'visible',timeout:15000});
   assert(await page.locator('.boot-scope').isVisible(),name+' boot instrument graphic missing');
+  if(isMobile){
+    const isTouchConsoleHidden=await page.locator('#mobile').evaluate(el=>getComputedStyle(el).display==='none');
+    assert(isTouchConsoleHidden,name+' flight controls visible behind start menu');
+  }
   assert.equal(await page.locator('.boot-item').count(),3,name+' boot commands missing');
   assert(!(await page.locator('body').innerText()).includes('THE SKY IS YOURS'),name+' legacy marketing intro remains');
   await page.waitForTimeout(550);

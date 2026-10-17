@@ -684,3 +684,7 @@
 @media(prefers-reduced-motion:reduce){
  .boot-screen *{animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
+
+
+/* Keep the operations-terminal opening free of gameplay touch controls. */
+#startScreen:not(.hidden) ~ #mobile {display:none!important}

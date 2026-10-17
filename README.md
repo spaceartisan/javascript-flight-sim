@@ -54,6 +54,14 @@ Warnings use a **single priority annunciator** instead of stacking banners, and 
 5. Eliminate all three moving drones, return to Sierra runway, lower gear, choose flaps, reduce throttle, and land. Brake on rollout using Space. Stopping safely after all contacts are destroyed completes the sortie.
 6. If you crash, press Enter to restart.
 
+## Operations terminal menu (v0.7)
+
+The AERONAUT startup is now an **in-universe console operations terminal**, not a generic web-game landing page. It takes inspiration from PS2-era tactical mission interfaces without copying a specific game's art: cool navy atmospheric lighting, an animated vector aircraft diagram and radar rings, precision-line overlays, compact mission data and terse operational typography. The opening stays backed by the game's real rotating 3D Kestrel scene.
+
+**Menu commands:** START SORTIE, FLIGHT MANUAL, and SYSTEM CONFIG. Keyboard Up/Down + Enter, standard gamepad left stick/D-pad + A, mouse and touch work. Flight manual opens the existing usable control guide. SYSTEM CONFIG edits the same persisted pitch-inversion, sensitivity and dead-zone settings as the in-flight manual, plus a saved audio-output preference. B/Escape returns from submenus.
+
+The menu requires **no new images, sample packs or frameworks**. All graphics are SVG/CSS and the existing rendered aircraft. The browser smoke suite captures *real startup-screen screenshots* at desktop, landscape-phone and portrait-phone sizes, opens the manual/options, and confirms sortie startup still functions.
+
 ## Minimal flight display (v0.6)
 
 The default **MINIMAL** cockpit prioritizes the view out of the aircraft:

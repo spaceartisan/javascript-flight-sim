@@ -43,7 +43,72 @@
  <div id="alerts" class="alerts"></div>
  <footer class="footerbar glass"><div><span class="legend">W / S</span> PITCH <span class="legend">A / D</span> ROLL <span class="legend">Q / E</span> RUDDER <span class="legend">SHIFT / CTRL</span> THROTTLE</div><div><span class="legend">G</span> GEAR <span class="legend">F</span> FLAPS <span class="legend">SPACE</span> BRAKE <span class="legend">M</span> FIRE <span class="legend">V</span> VIEW</div></footer>
 </div>
-<div id="startScreen" class="overlay"><div class="overglow"></div><div class="intro-shell"><div class="intro-eyebrow"><span class="state-dot"></span> AERONAUT DIVISION <span class="hairline"></span> FLIGHT SIMULATION</div><h1>THE SKY<br>IS <i>YOURS.</i></h1><p class="intro-lead">A precision-driven tactical flight experience.<br>Light the afterburner. Own the runway. Control the engagement.</p><div class="intro-features"><span><b>01</b> FLIGHT DYNAMICS</span><span><b>02</b> TACTICAL COMBAT</span><span><b>03</b> FULL INSTRUMENTATION</span></div><div class="intro-bottom"><button id="startButton" class="primary">INITIATE FLIGHT <span>↗</span></button><div><b>F-27 KESTREL</b><small>SIERRA NAVAL AIR STATION <em>—</em> RUNWAY 36</small></div></div></div><div class="intro-sidebar"><div class="side-number">01 <span>/ 03</span></div><div class="side-rule"></div><span>TACTICAL AVIATION<br>TRAINING OPERATIONS</span></div></div>
+<div id="startScreen" class="overlay boot-screen" aria-label="AERONAUT main menu">
+  <div class="boot-darkwash" aria-hidden="true"></div>
+  <div class="boot-grid" aria-hidden="true"></div>
+  <div class="boot-horizon-scan" aria-hidden="true"></div>
+  <div class="boot-scope" aria-hidden="true">
+    <div class="boot-scope-halo"></div>
+    <div class="boot-scope-trace"></div>
+    <div class="boot-scope-ring ring-one"></div>
+    <div class="boot-scope-ring ring-two"></div>
+    <div class="boot-scope-ring ring-three"></div>
+    <svg class="boot-schematic" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M200 35L208 156L337 208L339 219L209 201L208 321L242 345L242 354L201 345L159 354L159 345L193 321L191 201L61 219L63 208L192 156L200 35Z" stroke="currentColor" stroke-width="1.2"/>
+      <path d="M200 44V347M40 200H360M101 101L299 299M299 101L101 299" stroke="currentColor" stroke-width=".45" stroke-dasharray="3 9" opacity=".48"/>
+      <circle cx="200" cy="200" r="113" stroke="currentColor" stroke-width=".6" stroke-dasharray="8 11" opacity=".55"/>
+      <path d="M177 55H223M177 345H223M55 178V223M345 178V223" stroke="currentColor" stroke-width="1.5"/>
+      <circle cx="200" cy="200" r="5" stroke="currentColor"/>
+    </svg>
+    <span class="boot-scope-label">KESTREL / F-27</span>
+    <span class="boot-scope-serial">A/C 027 — AIRFRAME REFERENCE</span>
+  </div>
+  <header class="boot-header">
+    <div class="boot-sigil" aria-hidden="true"><span>⌁</span><b>A</b></div>
+    <div class="boot-header-type"><span>AERONAUT</span><small>TACTICAL FLIGHT SYSTEM / OPERATIONS DIVISION</small></div>
+    <div class="boot-header-right"><span class="boot-green-pip"></span> SYSTEM READY <i> / </i> 07.36.1</div>
+  </header>
+  <main class="boot-main">
+    <section class="boot-command">
+      <div class="boot-protocol"><span class="boot-line"></span> SYSTEM / 00 <span class="boot-protocol-slash">//</span> SIERRA</div>
+      <div class="boot-wordmark">AERONAUT<span class="boot-wordmark-notch">.</span></div>
+      <div class="boot-wordmark-sub">FLIGHT OPERATIONS</div>
+      <div class="boot-prompt">SELECT OPERATION <span class="boot-blink">_</span></div>
+      <nav id="bootMenu" class="boot-nav" aria-label="Main menu">
+        <button type="button" id="startButton" class="boot-item selected" data-menu-index="0" aria-current="true"><span class="boot-item-num">01</span><span class="boot-item-title">START SORTIE</span><span class="boot-item-arrow">›</span></button>
+        <button type="button" id="menuTraining" class="boot-item" data-menu-index="1"><span class="boot-item-num">02</span><span class="boot-item-title">FLIGHT MANUAL</span><span class="boot-item-arrow">›</span></button>
+        <button type="button" id="menuOptions" class="boot-item" data-menu-index="2"><span class="boot-item-num">03</span><span class="boot-item-title">SYSTEM CONFIG</span><span class="boot-item-arrow">›</span></button>
+      </nav>
+      <div class="boot-instruction"><span class="boot-key">↑</span><span class="boot-key">↓</span> SELECT <span class="boot-key boot-enter">ENTER</span> CONFIRM <span class="boot-ctrl-separator">/</span> TOUCH ENABLED</div>
+    </section>
+    <aside class="boot-dossier" aria-label="Sortie briefing">
+      <div class="boot-dossier-head"><span>OPERATION / 001</span><span class="boot-dossier-live"><i></i> READY</span></div>
+      <div class="boot-dossier-code">SIERRA / 36</div>
+      <div class="boot-dossier-sub">TACTICAL INTERCEPT TRAINING</div>
+      <div class="boot-dossier-rule"></div>
+      <div class="boot-dossier-row"><span>AIRCRAFT</span><b>F-27 KESTREL</b></div>
+      <div class="boot-dossier-row"><span>DEPARTURE</span><b>RUNWAY 36</b></div>
+      <div class="boot-dossier-row"><span>LOADOUT</span><b>RAZOR-9 × 04</b></div>
+      <div class="boot-dossier-row"><span>OBJECTIVE</span><b>03 UAV CONTACTS</b></div>
+      <div class="boot-dossier-rule"></div>
+      <p>DEPART SIERRA. INTERCEPT ALL CONTACTS.<br>RETURN TO BASE FOR RECOVERY.</p>
+      <div class="boot-dossier-coordinates">NAV 36.004 / SYS ONLINE <span>∎ ∎ ∎ ▤ ▤</span></div>
+    </aside>
+  </main>
+  <footer class="boot-footer"><span>MISSION ARCHIVE / 001 — SIERRA AIR STATION</span><span>PRESS ENTER TO BEGIN <b>◈</b></span><span>© AERONAUT DIVISION / FLIGHT SYSTEM 06</span></footer>
+  <section id="bootOptions" class="boot-options hidden" role="dialog" aria-modal="true" aria-labelledby="bootOptionsTitle">
+    <div class="boot-options-content">
+      <div class="boot-options-top"><span class="boot-line"></span> OPERATOR TERMINAL / CONFIGURATION <button id="bootOptionsClose" type="button" aria-label="Return to main menu">×</button></div>
+      <h2 id="bootOptionsTitle">SYSTEM CONFIG<span>.</span></h2>
+      <p>CONTROL RESPONSE / AUDIO SYSTEM</p>
+      <label class="boot-option-toggle"><span>PITCH AXIS <small>INVERT VERTICAL STICK</small></span><input type="checkbox" id="menuInvertPitch"></label>
+      <label class="boot-option-slider"><span>FLIGHT SENSITIVITY <output id="menuSensitivityValue">100%</output></span><input type="range" id="menuSensitivity" min="0.55" max="1.45" step="0.05" value="1"></label>
+      <label class="boot-option-slider"><span>STICK DEAD ZONE <output id="menuDeadzoneValue">8%</output></span><input type="range" id="menuDeadzone" min="0.02" max="0.22" step="0.01" value=".075"></label>
+      <button id="menuAudio" type="button" class="boot-option-audio">AUDIO OUTPUT <span id="menuAudioState">ENABLED</span></button>
+      <button id="menuBack" type="button" class="boot-option-return">‹ RETURN TO MAIN MENU</button>
+    </div>
+  </section>
+</div>
 <div id="helpScreen" class="modal hidden"><div class="help-sheet glass"><button id="closeHelp" class="x">✕</button><div class="intro-eyebrow">PILOT OPERATIONS MANUAL <span class="hairline"></span> REV. 1</div><h2>FLIGHT CONTROLS</h2><div class="help-grid"><div><h3>FLIGHT</h3><p><kbd>W</kbd> / <kbd>↑</kbd> Pitch nose down</p><p><kbd>S</kbd> / <kbd>↓</kbd> Pitch nose up</p><p><kbd>A</kbd> / <kbd>D</kbd> Roll left / right</p><p><kbd>Q</kbd> / <kbd>E</kbd> Rudder left / right</p><p><kbd>Shift</kbd> / <kbd>Ctrl</kbd> Increase / decrease throttle</p><p><kbd>R</kbd> Full afterburner <kbd>T</kbd> Idle</p></div><div><h3>AIRCRAFT</h3><p><kbd>G</kbd> Landing gear toggle</p><p><kbd>F</kbd> Flaps (0° / 12° / 25°)</p><p><kbd>Space</kbd> Wheel brakes (hold)</p><p><kbd>Gamepad</kbd> Left stick pitch/roll · right stick rudder · triggers throttle · A fire · B target · X brake · Y gear · LB flaps · RB camera · Start pause</p><p><kbd>V</kbd> Camera mode</p><p><kbd>U</kbd> Toggle sound</p><p><kbd>F2</kbd> Compact / detailed HUD <kbd>J</kbd> Radar visibility</p><p><kbd>C</kbd> Flight stability assist</p><p><kbd>P</kbd> Pause simulation</p></div><div><h3>COMBAT & MISSION</h3><p><kbd>Tab</kbd> Next radar target</p><p><kbd>M</kbd> / <kbd>Enter</kbd> Launch missile</p><p>Acquire a target within 5 km and inside your forward seeker cone. Wait for the green LOCK indicator before firing.</p><p>Destroy three drones, then return and stop on the runway for rearm and mission completion.</p></div></div><section class="control-config" aria-label="Control preferences">
  <h3>CONTROL RESPONSE <span id="controllerStatus">KEYBOARD / TOUCH READY</span></h3>
  <div class="config-grid">

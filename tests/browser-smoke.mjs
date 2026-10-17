@@ -15,6 +15,30 @@ async function testMode(name,viewport,isMobile){
  page.on('pageerror',err=>errors.push(String(err.stack||err)));
  try{
   await page.goto('http://127.0.0.1:8080/',{waitUntil:'domcontentloaded',timeout:30000});
+  // Main menu is the real PS2-era console operations terminal, not a web hero page.
+  await page.locator('#startScreen').waitFor({state:'visible',timeout:15000});
+  assert(await page.locator('.boot-scope').isVisible(),name+' boot instrument graphic missing');
+  assert.equal(await page.locator('.boot-item').count(),3,name+' boot commands missing');
+  assert(!(await page.locator('body').innerText()).includes('THE SKY IS YOURS'),name+' legacy marketing intro remains');
+  await page.waitForTimeout(550);
+  await page.screenshot({path:`test-results/menu-${name}.png`,fullPage:true});
+  if(isMobile){
+    await page.locator('#menuOptions').click({timeout:12000});
+    await page.locator('#bootOptions').waitFor({state:'visible',timeout:4000});
+    await page.locator('#menuBack').click();
+    await page.locator('#bootOptions').waitFor({state:'hidden',timeout:4000});
+  }else{
+    await page.keyboard.press('ArrowDown');
+    assert(await page.locator('#menuTraining').getAttribute('aria-current')==='true',name+' keyboard menu selection failed');
+    await page.keyboard.press('Enter');
+    await page.locator('#helpScreen').waitFor({state:'visible',timeout:5000});
+    await page.locator('#closeHelp').click();
+    await page.locator('#menuOptions').click();
+    await page.locator('#bootOptions').waitFor({state:'visible',timeout:4000});
+    await page.locator('#menuSensitivity').evaluate(el=>{el.value='1.15';el.dispatchEvent(new Event('input',{bubbles:true}))});
+    assert.equal(await page.locator('#menuSensitivityValue').innerText(),'115%',name+' menu configuration not interactive');
+    await page.locator('#menuBack').click();
+  }
   await page.locator('#startButton').click({timeout:15000});
   await page.locator('#hud').waitFor({state:'visible',timeout:15000});
   await page.waitForTimeout(1400);

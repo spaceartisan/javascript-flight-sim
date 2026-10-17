@@ -434,3 +434,253 @@
  .hud.compact .data-cell{flex:0 0 auto;min-width:70px;max-width:88px;padding:6px 8px}
  .hud.compact .mini-status{right:9px;top:12px;background:transparent}
 }
+
+
+/* ==========================================================================
+   AERONAUT / OPERATIONS TERMINAL — PS2-era console interface v0.7
+   Nothing here is a marketing page: aircraft, mission and systems come first.
+   ========================================================================== */
+#startScreen.boot-screen{
+ position:fixed;inset:0;z-index:10;display:block;overflow:hidden;
+ padding:0;margin:0;background:transparent;
+ color:#e3e8e5;isolation:isolate;
+ font-family:'DM Mono',monospace;
+}
+.boot-screen .boot-darkwash{
+ position:absolute;inset:0;z-index:-1;pointer-events:none;
+ background:
+ linear-gradient(100deg,rgba(2,12,24,.985) 0%,rgba(2,12,25,.965) 22%,rgba(3,16,28,.78) 41%,rgba(2,12,20,.3) 69%,rgba(2,8,16,.73) 100%),
+ linear-gradient(0deg,rgba(1,10,21,.92) 0%,rgba(0,13,23,.05) 39%,rgba(1,9,19,.72) 100%);
+}
+.boot-screen .boot-grid{
+ position:absolute;inset:0;z-index:-1;opacity:.42;pointer-events:none;
+ background-image:
+ linear-gradient(rgba(117,177,202,.105) 1px,transparent 1px),
+ linear-gradient(90deg,rgba(117,177,202,.105) 1px,transparent 1px);
+ background-size:110px 110px;
+ mask-image:linear-gradient(90deg,black 0%,rgba(0,0,0,.3) 54%,black 100%);
+}
+.boot-screen .boot-grid::after{
+ content:'';position:absolute;inset:0;
+ background:repeating-linear-gradient(90deg,transparent 0,transparent 548px,rgba(191,240,222,.18) 550px);
+ opacity:.36;
+}
+.boot-screen .boot-horizon-scan{
+ position:absolute;inset:0;z-index:-1;pointer-events:none;
+ background:linear-gradient(to bottom,transparent 0%,rgba(95,233,213,.07) 50%,transparent 52%);
+ background-size:100% 360px;animation:boot-scan 18s linear infinite;opacity:.28;
+}
+@keyframes boot-scan{from{background-position:0 -550px}to{background-position:0 1450px}}
+.boot-screen .boot-header{
+ position:absolute;top:0;left:0;right:0;height:98px;z-index:3;
+ display:flex;align-items:center;gap:17px;
+ padding:23px clamp(25px,5vw,85px);
+ border-bottom:1px solid rgba(167,216,224,.13);
+}
+.boot-sigil{
+ position:relative;width:48px;height:48px;flex:0 0 auto;
+ display:grid;place-items:center;
+ border:1px solid rgba(143,219,224,.46);
+ clip-path:polygon(0 0,100% 0,100% 65%,66% 100%,0 100%);
+ color:#d0e9e6;font:700 32px Barlow Condensed,sans-serif;
+}
+.boot-sigil span{position:absolute;top:2px;right:5px;font-size:10px;color:#89dbe1;font-family:'DM Mono'}
+.boot-sigil b{font-weight:800}
+.boot-header-type span{font:700 22px Barlow Condensed,sans-serif;letter-spacing:.25em;color:#ecf5ef}
+.boot-header-type small{
+ display:block;font:9px/1.5 'DM Mono',monospace;
+ color:#85a4b8;letter-spacing:.09em;margin-top:5px
+}
+.boot-header-right{margin-left:auto;color:#bdd6d8;font:10px DM Mono;letter-spacing:.12em;white-space:nowrap}
+.boot-header-right i{font-style:normal;color:#657f93;padding:0 8px}
+.boot-green-pip{display:inline-block;width:7px;height:7px;border:1px solid #b4ffdf;background:#4ee8bb;border-radius:50%;box-shadow:0 0 16px rgba(88,246,208,.6);margin:0 10px 0 0}
+.boot-screen .boot-main{
+ position:absolute;inset:98px 0 67px;display:grid;
+ grid-template-columns:minmax(360px,49%) minmax(0,51%);
+ align-items:center;gap:0;
+ padding:0 clamp(25px,5vw,85px);
+}
+.boot-command{align-self:center;max-width:570px;padding:10px 30px 10px 0;position:relative;z-index:2}
+.boot-protocol{display:flex;gap:11px;align-items:center;color:#84abb8;font:10px DM Mono;letter-spacing:.2em;margin-bottom:14px}
+.boot-line{display:inline-block;width:25px;height:1px;background:#72ccd5}
+.boot-protocol-slash{color:#53828c}
+.boot-wordmark{
+ font:800 clamp(66px,7.2vw,138px)/.87 Barlow Condensed,sans-serif;
+ letter-spacing:-.025em;color:#e3eeee;
+ text-shadow:0 0 48px rgba(119,204,221,.17);
+}
+.boot-wordmark-notch{color:#6bccd1;text-shadow:0 0 24px rgba(80,240,236,.38)}
+.boot-wordmark-sub{font:500 11px DM Mono;letter-spacing:.59em;color:#a6dce1;margin-top:16px}
+.boot-prompt{
+ margin-top:clamp(29px,6vh,76px);
+ color:#6e9fae;font:10px DM Mono;letter-spacing:.24em;padding:0 0 15px 0;
+ border-bottom:1px solid rgba(119,188,202,.23);
+}
+.boot-blink{display:inline-block;color:#94e4d6;animation:boot-blink 1.15s steps(1) infinite}
+@keyframes boot-blink{50%{opacity:0}}
+.boot-nav{display:flex;flex-direction:column;align-items:stretch;gap:0;margin-top:5px;max-width:510px}
+.boot-item{
+ position:relative;display:grid;grid-template-columns:49px 1fr 30px;
+ align-items:center;gap:9px;height:66px;width:100%;
+ border:0;border-bottom:1px solid rgba(151,191,204,.14);
+ background:transparent;cursor:pointer;color:#8faab7;
+ padding:0 9px 0 0;text-align:left;border-radius:0;
+ transition:background .17s ease,color .16s ease,transform .16s ease;
+ font:500 20px Barlow Condensed,sans-serif;
+}
+.boot-item:focus-visible{outline:1px solid rgba(171,247,238,.85);outline-offset:-1px}
+.boot-item:hover,.boot-item.selected,.boot-item:focus-visible{
+ color:#ebfaf3;background:linear-gradient(90deg,rgba(106,227,210,.13),rgba(18,59,77,.06) 73%,transparent);
+}
+.boot-item.selected::before{content:'';position:absolute;left:-15px;top:15px;bottom:15px;width:3px;background:#89e8d8;box-shadow:0 0 20px rgba(123,245,218,.65)}
+.boot-item-num{font:10px DM Mono;letter-spacing:.1em;color:#698899;padding-left:8px}
+.boot-item.selected .boot-item-num{color:#9be7dc}
+.boot-item-title{font:600 clamp(18px,2.2vw,27px) Barlow Condensed,sans-serif;letter-spacing:.11em}
+.boot-item-arrow{font:300 32px Barlow Condensed;opacity:0;color:#94f4e2;text-align:right;transition:opacity .15s,transform .15s}
+.boot-item.selected .boot-item-arrow,.boot-item:hover .boot-item-arrow,.boot-item:focus-visible .boot-item-arrow{opacity:1;transform:translateX(3px)}
+.boot-instruction{margin-top:23px;font:9px DM Mono;color:#748a9a;letter-spacing:.075em;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.boot-key{display:inline-block;color:#b9e5e1;padding:4px 6px;border:1px solid rgba(129,185,199,.38);border-radius:1px;font-size:10px}
+.boot-key.boot-enter{margin-left:9px}
+.boot-ctrl-separator{color:#365967;margin:0 10px}
+.boot-dossier{
+ z-index:2;position:absolute;right:clamp(25px,5vw,85px);
+ bottom:clamp(28px,8vh,94px);width:min(30vw,335px);
+ padding:17px 20px 19px;border-left:1px solid rgba(136,209,211,.4);
+ background:linear-gradient(90deg,rgba(1,13,24,.56),rgba(2,18,29,.2));
+ backdrop-filter:blur(3px);
+}
+.boot-dossier-head{display:flex;justify-content:space-between;gap:6px;color:#8faeb9;font:9px DM Mono;letter-spacing:.1em}
+.boot-dossier-live{color:#bbf9e5}
+.boot-dossier-live i{display:inline-block;width:5px;height:5px;background:#90eec4;border-radius:50%;vertical-align:2px;margin-right:4px}
+.boot-dossier-code{font:600 44px/1 Barlow Condensed,sans-serif;letter-spacing:.08em;color:#e5f2ed;margin-top:14px}
+.boot-dossier-sub{font:9px DM Mono;letter-spacing:.09em;color:#9fc0cd;margin-top:6px}
+.boot-dossier-rule{border-bottom:1px solid rgba(142,188,200,.22);margin:16px 0 12px}
+.boot-dossier-row{display:flex;align-items:center;justify-content:space-between;gap:13px;font:10px/2.35 DM Mono}
+.boot-dossier-row span{color:#728e9f}.boot-dossier-row b{color:#d1e5e7;font-weight:500;text-align:right}
+.boot-dossier p{font:9px/2 DM Mono;letter-spacing:.035em;color:#a8c3c5;margin:6px 0}
+.boot-dossier-coordinates{color:#7ca5b2;font:8px DM Mono;letter-spacing:.06em;margin-top:19px;display:flex;justify-content:space-between;gap:8px}
+.boot-dossier-coordinates span{color:#8cdbc4}
+.boot-screen .boot-footer{
+ position:absolute;left:0;right:0;bottom:0;z-index:3;
+ height:67px;display:flex;align-items:center;justify-content:space-between;
+ gap:16px;padding:0 clamp(25px,5vw,85px);color:#6f91a4;
+ border-top:1px solid rgba(169,219,226,.13);
+ background:rgba(0,9,20,.50);font:9px DM Mono;letter-spacing:.1em;
+}
+.boot-footer b{font-size:16px;color:#9ee4d5;font-weight:400}
+.boot-footer span:nth-child(2){color:#afd8d6}
+.boot-screen .boot-scope{
+ position:absolute;z-index:1;left:54%;top:48%;width:min(37vw,550px);aspect-ratio:1;
+ transform:translate(-50%,-50%);opacity:.57;pointer-events:none;color:#8ae0e3;
+ filter:drop-shadow(0 0 12px rgba(74,181,204,.13));
+}
+.boot-scope-halo{position:absolute;inset:11%;border-radius:50%;background:radial-gradient(circle,transparent 40%,rgba(51,139,171,.075) 62%,transparent 76%)}
+.boot-scope-ring{position:absolute;inset:0;border:1px solid rgba(130,207,224,.16);border-radius:50%;box-shadow:inset 0 0 40px rgba(53,176,192,.07)}
+.boot-scope-ring.ring-two{inset:13%;border-style:dashed;border-color:rgba(145,222,213,.24);animation:boot-turn 90s linear infinite}
+.boot-scope-ring.ring-three{inset:30%;border-color:rgba(145,222,215,.27)}
+.boot-scope-ring.ring-one::before,.boot-scope-ring.ring-one::after{content:'';position:absolute;left:50%;top:0;height:100%;width:1px;background:linear-gradient(transparent,rgba(123,215,214,.27),transparent)}
+.boot-scope-ring.ring-one::after{transform:rotate(90deg)}
+.boot-scope-trace{position:absolute;inset:4%;border-radius:50%;border:1px solid rgba(113,224,224,.3);border-left-color:transparent;border-top-color:transparent;transform:rotate(-16deg);animation:boot-turn 38s linear infinite}
+.boot-schematic{position:absolute;inset:11%;width:78%;height:78%;color:#a9e8e6;opacity:.62;animation:boot-schematic 16s ease-in-out infinite}
+.boot-scope-label{position:absolute;left:12%;top:14%;font:10px DM Mono;letter-spacing:.12em;color:#c5f4e8}
+.boot-scope-serial{position:absolute;right:4%;bottom:17%;font:8px DM Mono;letter-spacing:.1em;color:#90c4cc;writing-mode:vertical-rl}
+@keyframes boot-turn{to{transform:rotate(360deg)}}
+@keyframes boot-schematic{50%{opacity:.8;transform:scale(1.035) rotate(2deg)}}
+.boot-screen .boot-options{
+ position:absolute;inset:0;z-index:16;display:grid;place-items:center;
+ background:rgba(1,10,21,.9);backdrop-filter:blur(14px);padding:20px;
+}
+.boot-screen .boot-options.hidden{display:none!important}
+.boot-options-content{
+ width:min(100%,540px);max-height:92vh;overflow:auto;
+ padding:24px 29px 32px;border:1px solid rgba(144,220,214,.24);
+ background:linear-gradient(150deg,rgba(12,42,55,.94),rgba(3,18,32,.96));
+ box-shadow:0 20px 100px rgba(0,0,0,.48);position:relative;
+}
+.boot-options-top{display:flex;align-items:center;gap:10px;color:#99bcc2;font:10px DM Mono;letter-spacing:.12em}
+.boot-options-top button{margin-left:auto;border:1px solid rgba(150,223,214,.27);background:transparent;color:#def7ef;font:20px DM Mono;width:36px;height:36px}
+.boot-options h2{font:800 clamp(38px,6vw,72px)/1 Barlow Condensed,sans-serif;letter-spacing:.02em;margin:30px 0 8px;color:#e9f2eb}
+.boot-options h2 span{color:#8bdfd9}
+.boot-options-content>p{margin:0 0 30px;color:#799eab;font:10px DM Mono;letter-spacing:.12em}
+.boot-option-toggle,.boot-option-slider,.boot-option-audio{
+ display:flex;justify-content:space-between;align-items:center;gap:10px;
+ color:#d8e8e8;font:12px DM Mono;letter-spacing:.07em;
+ padding:16px 0;border-bottom:1px solid rgba(123,194,204,.17);
+}
+.boot-option-toggle small{display:block;color:#738e9b;font:9px DM Mono;margin-top:7px}
+.boot-option-toggle input{width:20px;height:20px;accent-color:#8be1d4}
+.boot-option-slider{display:flex;flex-wrap:wrap}
+.boot-option-slider span{width:100%;display:flex;justify-content:space-between}
+.boot-option-slider output{color:#a0eadc}
+.boot-option-slider input{width:100%;margin:12px 0 1px;accent-color:#9beedc}
+.boot-option-audio{width:100%;cursor:pointer;background:transparent;text-align:left;border-left:0;border-right:0;border-top:0}
+.boot-option-audio span{color:#9ee5d6}
+.boot-option-return{
+ margin-top:29px;background:rgba(48,118,116,.15);border:1px solid rgba(158,232,220,.45);
+ color:#d9f7ef;font:11px DM Mono;letter-spacing:.11em;padding:13px 19px;cursor:pointer
+}
+.boot-option-return:hover,.boot-option-return:focus-visible{background:rgba(74,178,161,.2)}
+@media(max-width:1050px){
+ .boot-screen .boot-main{grid-template-columns:minmax(310px,60%) 1fr}
+ .boot-screen .boot-scope{left:70%;top:43%;width:40vw;opacity:.45}
+ .boot-dossier{width:265px;bottom:37px;right:32px}
+ .boot-wordmark{font-size:clamp(66px,8vw,108px)}
+ .boot-dossier-code{font-size:34px}
+}
+@media(max-width:700px){
+ .boot-screen .boot-header{height:71px;padding:12px 21px;gap:11px}
+ .boot-sigil{width:33px;height:33px;font-size:22px}
+ .boot-header-type span{font-size:20px}
+ .boot-header-type small{font-size:7px}
+ .boot-header-right{font-size:8px}
+ .boot-header-right i{display:none}
+ .boot-screen .boot-main{inset:71px 0 50px;display:block;padding:0 21px}
+ .boot-command{width:100%;max-width:520px;padding:0;position:absolute;left:21px;right:21px;bottom:18%;width:auto}
+ .boot-protocol{font-size:8px;margin-bottom:12px}
+ .boot-wordmark{font-size:clamp(57px,12.8vw,105px)}
+ .boot-wordmark-sub{font-size:9px;letter-spacing:.4em;margin-top:9px}
+ .boot-prompt{margin-top:27px;padding-bottom:10px;font-size:9px}
+ .boot-item{height:53px}
+ .boot-item-title{font-size:22px}
+ .boot-instruction{font-size:8px;margin-top:13px}
+ .boot-scope{left:70%!important;top:29%!important;width:66vw!important;opacity:.43!important}
+ .boot-dossier{display:none}
+ .boot-screen .boot-footer{height:50px;padding:0 21px;font-size:8px}
+ .boot-footer span:nth-child(1){max-width:50%}
+ .boot-footer span:nth-child(3){display:none}
+}
+@media(max-width:700px) and (orientation:landscape), (max-height:570px){
+ .boot-screen .boot-header{height:54px;padding:7px 20px}
+ .boot-sigil{width:28px;height:28px;font-size:20px}
+ .boot-header-type span{font-size:18px}
+ .boot-header-type small{font-size:7px;margin-top:2px}
+ .boot-screen .boot-main{inset:54px 0 31px;display:flex;align-items:center;padding:0 22px}
+ .boot-command{position:relative;left:auto;right:auto;bottom:auto;width:min(50%,430px);max-width:none}
+ .boot-protocol{font-size:8px;margin-bottom:6px}
+ .boot-wordmark{font-size:clamp(54px,9vw,83px)}
+ .boot-wordmark-sub{font-size:8px;letter-spacing:.3em;margin-top:4px}
+ .boot-prompt{margin-top:15px;padding-bottom:6px;font-size:9px}
+ .boot-item{height:39px;grid-template-columns:32px 1fr 22px}
+ .boot-item-title{font-size:20px}
+ .boot-item.selected::before{top:7px;bottom:7px;left:-10px}
+ .boot-instruction{display:none}
+ .boot-screen .boot-scope{left:74%;top:43%;width:min(42vw,295px);opacity:.57}
+ .boot-screen .boot-footer{height:31px;font-size:8px;padding:0 20px}
+ .boot-dossier{display:none}
+}
+@media(max-width:430px) and (orientation:portrait){
+ .boot-header-right{display:none}
+ .boot-screen .boot-main{inset:71px 0 51px}
+ .boot-command{bottom:16%}
+ .boot-protocol{margin-bottom:13px}
+ .boot-wordmark{font-size:clamp(57px,15vw,76px)}
+ .boot-scope{left:55%!important;top:30%!important;width:93vw!important;opacity:.29!important}
+ .boot-prompt{margin-top:31px}
+ .boot-item{height:60px}
+ .boot-item-title{font-size:24px}
+ .boot-screen .boot-footer span:nth-child(2){display:none}
+ .boot-screen .boot-footer span:nth-child(1){max-width:none}
+}
+@media(prefers-reduced-motion:reduce){
+ .boot-screen *{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}

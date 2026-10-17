@@ -2,6 +2,7 @@ import {THREE,V,UP,FWD,renderer,scene,camera,sky,aircraft,drones} from './world.
 import {flight,keys,effects,toggleGear,cycleFlaps,selectTarget,getTarget,targetSolution,fireMissile,updateMissiles,updateDrones,updateFlight,resetFlight} from './sim.js';
 import {installControlUI} from './controls-ui.js';
 import {sound} from './audio.js';
+import {installBootMenu} from './boot-menu.js';
 const $=id=>document.getElementById(id);
 const clamp=THREE.MathUtils.clamp,KTS=1.943844,FT=3.28084,DEG=180/Math.PI;
 let toastAt=0,lastAlert='',lastNotice='',cameraMode=0,uiTimer=0;
@@ -193,10 +194,12 @@ document.addEventListener('keydown',e=>{
 });
 document.addEventListener('keyup',e=>keys.delete(e.code));
 addEventListener('blur',()=>{keys.clear();controlUI.resetTransient()});
-$('startButton').addEventListener('click',()=>{
- flight.started=true;$('startScreen').classList.add('hidden');$('hud').classList.remove('hidden');
- sound.init();
- notify('SIERRA TOWER: KESTREL ONE, CLEARED FOR TAKEOFF');
+const bootMenu=installBootMenu({
+ sound,started:()=>flight.started,onManual:showHelp,
+ onStart:()=>{
+  flight.started=true;$('startScreen').classList.add('hidden');$('hud').classList.remove('hidden');
+  notify('SIERRA TOWER: KESTREL ONE, CLEARED FOR TAKEOFF');
+ }
 });
 $('helpButton').addEventListener('click',showHelp);
 $('closeHelp').addEventListener('click',()=>$('helpScreen').classList.add('hidden'));
@@ -206,6 +209,7 @@ let prev=performance.now(),accumulator=0;
 function loop(now){
  requestAnimationFrame(loop);
  controlUI.tick();
+ if(!flight.started)bootMenu.tick();
  const dt=Math.min(.045,Math.max(0,(now-prev)/1000));prev=now;
  if(flight.started&&!flight.paused){
   accumulator+=dt;let steps=0;

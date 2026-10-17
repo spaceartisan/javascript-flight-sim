@@ -159,4 +159,20 @@ assert(touch.includes('updateSystemVisibility'),'mobile systems must be contextu
 assert(touch.includes("flight.pos.y<350"),'ground/approach landing controls must stay visible');
 assert(css.includes(".hud.compact .right-column{display:none}"),'full-sized weapons panel cannot be permanent in minimal mode');
 assert(css.includes(".mobile-v2 .mobile-console.systems-visible .systems-row-mobile"),'mobile systems expansion missing');
-console.log('AERONAUT validation passed: models, materials, aerodynamics, sound, multi-device controls and low-obstruction HUD.');
+// v0.7 console-terminal entry screen regression checks.
+const bootMenu=read('boot-menu.js');
+for(const id of ['bootMenu','startButton','menuTraining','menuOptions','bootOptions',
+ 'menuBack','bootOptionsClose','menuInvertPitch','menuSensitivity','menuDeadzone',
+ 'menuAudio','menuAudioState']){
+ assert(html.includes('id="'+id+'"'),'Console interface is missing '+id);
+}
+assert(!html.includes('THE SKY'),'Legacy AI-style marketing slogan returned');
+assert(!html.includes('intro-features'),'Legacy marketing cards returned');
+assert(html.includes('boot-schematic')&&html.includes('boot-dossier'),'Console aircraft visual and mission dossier missing');
+assert(main.includes("import {installBootMenu} from './boot-menu.js'"),'Menu is not mounted in flight runtime');
+assert(main.includes('bootMenu.tick()'),'Gamepad menu navigation does not run in render loop');
+assert(bootMenu.includes('data')||bootMenu.includes("commands=['startButton'"),'Menu command mapping missing');
+assert(bootMenu.includes('keydown')&&bootMenu.includes('gamepad.buttons'),'Keyboard and gamepad menu navigation missing');
+assert(bootMenu.includes("updateSettings(")&&bootMenu.includes("'menuAudio'"),'Options dialog does not change real settings');
+assert(css.includes('.boot-screen .boot-header')&&css.includes('.boot-scope-ring'),'Console-specific rendering missing');
+console.log('AERONAUT validation passed: live console entry, three menu commands, gamepad navigation, settings and full game runtime.');

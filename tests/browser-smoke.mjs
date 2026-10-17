@@ -57,10 +57,15 @@ async function testMode(name,viewport,isMobile){
    assert.equal(await page.locator('#mobileThrottle').inputValue(),'0',name+' throttle did not reset');
   }else{
    await page.keyboard.down('Shift');
-   await page.waitForTimeout(900);
+   const state=await page.evaluate(async()=>{
+    const sim=await import('./sim.js');
+    const before=sim.flight.throttle;
+    const pressed=[...sim.keys];
+    for(let i=0;i<35;i++)sim.updateFlight(1/90);
+    return {before,after:sim.flight.throttle,pressed,clock:sim.flight.clock,crashed:sim.flight.crashed,paused:sim.flight.paused};
+   });
    await page.keyboard.up('Shift');
-   const power=await page.evaluate(async()=>{const {flight}=await import('./sim.js');return flight.throttle});
-   assert(power>.08,name+' keyboard throttle failed');
+   assert(state.after>state.before+.08,name+' keyboard throttle did not reach flight model: '+JSON.stringify(state));
    await page.keyboard.press('h');
    assert(await page.locator('#helpScreen').isVisible(),'help manual failed to open');
    await page.locator('#closeHelp').click();

@@ -127,4 +127,23 @@ for(const token of ['terrainMixWeights','sampleRock','smoothstep(.15,.48,slope)'
 }
 assert(fs.existsSync(new URL('../tools/generate-terrain-textures.py',import.meta.url)),
  'Terrain material source generator missing');
-console.log('AERONAUT validation passed: Blender assets, GeneralUser audio and geological height/slope blended PBR terrain textures.');
+// v0.5: responsive flight input is not duplicated between mobile and desktop.
+const input=read('controls.js'),touch=read('controls-ui.js');
+assert(sim.includes("import {readControls,setThrottleStep,setTouchAxes} from './controls.js'"),'physics missing shared control input');
+assert(sim.includes('flight.brake=onGround&&input.brake'),'mobile wheel brake is not connected to physics');
+assert(main.includes("import {installControlUI} from './controls-ui.js'"),'mobile controller not mounted');
+for(const id of ['stickZone','stickRing','stickKnob','mobileTarget','mobileFire','mobileGear',
+ 'mobileFlaps','mobileBrake','mobileIdle','mobileAB','mobileThrottle','mobileThrottleValue',
+ 'mobilePause','mobileFullscreen','rudderLeft','rudderRight','pauseScreen','resumeFlight',
+ 'restartFlight','pauseHelp','invertPitch','sensitivity','deadzone','controllerStatus']){
+ assert(html.includes('id="'+id+'"'), 'Touch controller DOM missing '+id);
+}
+assert(input.includes("SETTINGS_KEY='aeronaut-controls-v1'"),'control calibration preferences not versioned');
+assert(input.includes('gamepad')&&input.includes('pollGamepad'),'controller handling missing');
+assert(input.includes('touch.brake')&&touch.includes("setTouchBrake"),'touch braking not routed');
+assert(touch.includes("pointercancel")&&touch.includes('lostpointercapture'),'pointer cleanup missing');
+assert(touch.includes('zone.setPointerCapture')&&touch.includes('flightMove'),'floating flight stick missing');
+assert(touch.includes("rudderPointers")&&touch.includes("mobileThrottle"),'multi-touch cockpit controls missing');
+assert(touch.includes('resetTransient')&&touch.includes('resetFlight')===false,'touch cleanup missing or simulation tightly coupled');
+assert(fs.existsSync(new URL('./controls.test.mjs', import.meta.url)),'deterministic control tests missing');
+console.log('AERONAUT validation passed: flight model, art, audio, terrain and keyboard/mobile/gamepad controls.');

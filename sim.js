@@ -1,4 +1,5 @@
 import {THREE,V,UP,FWD,scene,aircraft,drones,makeMissileModel,height,shadowDisc,sky,sun} from './world.js';
+import {readControls,setThrottleStep,setTouchAxes} from './controls.js';
 const clamp=THREE.MathUtils.clamp,lerp=THREE.MathUtils.lerp;
 const RAD=Math.PI/180,DEG=180/Math.PI;
 export const keys=new Set();
@@ -7,8 +8,8 @@ gear:true,flaps:1,brake:false,assist:true,fuel:100,missiles:4,kills:0,score:0,
 airborne:false,crashed:false,paused:false,started:false,phase:'GROUND • READY',
 gload:1,aoa:0,airspeed:0,verticalSpeed:0,lock:false,selected:0,clock:0,missionDone:false,lastTouchdown:0};
 export const effects={notify:()=>{},chirp:()=>{},boom:()=>{},launch:()=>{},gear:()=>{},flap:()=>{},select:()=>{},complete:()=>{}};
-export let mobileX=0,mobileY=0;
-export function setStick(x,y){mobileX=x;mobileY=y}
+// Legacy adapter for embedded tools; current mobile controller uses controls.js directly.
+export function setStick(x,y){setTouchAxes(x,y,x!==0||y!==0)}
 export function toggleGear(){
  if(flight.crashed)return;
  if(flight.airspeed<3&&flight.pos.y<3){effects.notify('GEAR LOCKED — AIRCRAFT ON GROUND');return}
@@ -95,14 +96,13 @@ const MASS=10600,WING=35,GRAV=9.80665;
 export function updateFlight(dt){
  if(flight.crashed||flight.paused)return;
  flight.clock+=dt;
- const shift=keys.has('ShiftLeft')||keys.has('ShiftRight'),control=keys.has('ControlLeft')||keys.has('ControlRight');
- if(shift)flight.throttle=clamp(flight.throttle+dt*.34,0,1);
- if(control)flight.throttle=clamp(flight.throttle-dt*.34,0,1);
+ const input=readControls(keys);
+ flight.throttle=clamp(flight.throttle+setThrottleStep(input,dt),0,1);
  flight.spool+=(flight.throttle-flight.spool)*Math.min(1,dt*1.2);
  flight.fuel=Math.max(0,flight.fuel-dt*(.0014+.0052*flight.spool));
- const pitch=clamp((keys.has('KeyS')||keys.has('ArrowDown')?1:0)-(keys.has('KeyW')||keys.has('ArrowUp')?1:0)+mobileY,-1,1);
- const roll=clamp((keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0)+mobileX,-1,1);
- const rudder=(keys.has('KeyE')?1:0)-(keys.has('KeyQ')?1:0);
+ const pitch=input.pitch;
+ const roll=input.roll;
+ const rudder=input.rudder;
  const ground=height(flight.pos.x,flight.pos.z)+(flight.gear?2:.88);
  const onGround=flight.pos.y<=ground+.13;
  const air=flight.vel.clone().sub(V(1.8,0,-2.4)),Vmag=air.length();
@@ -118,7 +118,7 @@ export function updateFlight(dt){
  const thrust=(flight.spool>.84?90000+(flight.spool-.84)/.16*59000:flight.spool/.84*90000)*(flight.fuel>0?1:0);
  const liftAxis=up.clone().addScaledVector(airDir,-up.dot(airDir));if(liftAxis.lengthSq()<.0001)liftAxis.copy(up);liftAxis.normalize();
  const acceleration=forward.clone().multiplyScalar(thrust/MASS).addScaledVector(liftAxis,dynamic*WING*cl/MASS).addScaledVector(airDir,-dynamic*WING*cd/MASS).add(V(0,-GRAV,0));
- flight.brake=onGround&&keys.has('Space');
+ flight.brake=onGround&&input.brake;
  if(onGround){
   const speed=flight.vel.length(),friction=flight.brake?5.8:.75;
   acceleration.addScaledVector(speed>.2?flight.vel.clone().normalize():forward,-friction);

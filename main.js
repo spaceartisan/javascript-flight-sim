@@ -1,5 +1,6 @@
 import {THREE,V,UP,FWD,renderer,scene,camera,sky,aircraft,drones} from './world.js';
-import {flight,keys,effects,setStick,toggleGear,cycleFlaps,selectTarget,getTarget,targetSolution,fireMissile,updateMissiles,updateDrones,updateFlight,resetFlight} from './sim.js';
+import {flight,keys,effects,toggleGear,cycleFlaps,selectTarget,getTarget,targetSolution,fireMissile,updateMissiles,updateDrones,updateFlight,resetFlight} from './sim.js';
+import {installControlUI} from './controls-ui.js';
 import {sound} from './audio.js';
 const $=id=>document.getElementById(id);
 const clamp=THREE.MathUtils.clamp,KTS=1.943844,FT=3.28084,DEG=180/Math.PI;
@@ -131,11 +132,23 @@ function updateHUD(){
 }
 function resize(){renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()}
 addEventListener('resize',resize);
+function showHelp(){keys.clear();controlUI.resetTransient();$('helpScreen').classList.remove('hidden')}
+function togglePause(forced){
+ if(!flight.started)return;
+ const next=typeof forced==='boolean'?forced:!flight.paused;
+ flight.paused=next;keys.clear();controlUI.resetTransient();
+ if(!next)accumulator=0;
+ notify(next?'SIMULATION PAUSED':'SIMULATION RESUMED');
+}
+const controlUI=installControlUI({
+ flight,keys,fireMissile,selectTarget,toggleGear,cycleFlaps,cycleView,togglePause,
+ restart:resetFlight,openHelp:showHelp,notify
+});
 const prevent=['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','Tab','ShiftLeft','ShiftRight','ControlLeft','ControlRight'];
 document.addEventListener('keydown',e=>{
  if(prevent.includes(e.code))e.preventDefault();
  if(e.repeat)return;
- if(e.code==='KeyH'){e.preventDefault();$('helpScreen').classList.toggle('hidden');return}
+ if(e.code==='KeyH'){e.preventDefault();if($('helpScreen').classList.contains('hidden'))showHelp();else $('helpScreen').classList.add('hidden');return}
  if(!$('helpScreen').classList.contains('hidden')){
   if(e.code==='Escape')$('helpScreen').classList.add('hidden');return;
  }
@@ -146,7 +159,7 @@ document.addEventListener('keydown',e=>{
  if(e.code==='KeyF')cycleFlaps();
  if(e.code==='KeyV')cycleView();
  if(e.code==='KeyC'){flight.assist=!flight.assist;notify('STABILITY ASSIST / '+(flight.assist?'ON':'OFF'))}
- if(e.code==='KeyP'){flight.paused=!flight.paused;notify(flight.paused?'SIMULATION PAUSED':'SIMULATION RESUMED')}
+ if(e.code==='KeyP'){togglePause();return}
  if(e.code==='KeyR'){flight.throttle=1;notify('AFTERBURNER SELECTED')}
  if(e.code==='KeyT'){flight.throttle=0;notify('THROTTLE IDLE')}
  if(e.code==='KeyU'){notify(sound.mute()?'AUDIO MUTED':'AUDIO ENABLED')}
@@ -155,34 +168,20 @@ document.addEventListener('keydown',e=>{
  keys.add(e.code);
 });
 document.addEventListener('keyup',e=>keys.delete(e.code));
-addEventListener('blur',()=>{keys.clear();setStick(0,0)});
+addEventListener('blur',()=>{keys.clear();controlUI.resetTransient()});
 $('startButton').addEventListener('click',()=>{
  flight.started=true;$('startScreen').classList.add('hidden');$('hud').classList.remove('hidden');
  sound.init();
  notify('SIERRA TOWER: KESTREL ONE, CLEARED FOR TAKEOFF');
 });
-$('helpButton').addEventListener('click',()=>$('helpScreen').classList.remove('hidden'));
+$('helpButton').addEventListener('click',showHelp);
 $('closeHelp').addEventListener('click',()=>$('helpScreen').classList.add('hidden'));
 $('viewButton').addEventListener('click',cycleView);
 $('hudModeButton').addEventListener('click',toggleHUD);
-$('mobileFire').addEventListener('click',fireMissile);
-$('mobileGear').addEventListener('click',toggleGear);
-$('mobileFlaps').addEventListener('click',cycleFlaps);
-$('mobileView').addEventListener('click',cycleView);
-$('mobileThrottle').addEventListener('input',e=>flight.throttle=Number(e.target.value)/100);
-const stick=$('stickZone'),knob=$('stickKnob');
-function moveStick(e){
- const b=stick.getBoundingClientRect(),cx=b.left+b.width/2,cy=b.top+b.height/2;
- const x=clamp((e.clientX-cx)/48,-1,1),y=clamp((e.clientY-cy)/48,-1,1);
- setStick(x,y);knob.style.transform='translate('+(x*32)+'px,'+(y*32)+'px)';
-}
-stick.addEventListener('pointerdown',e=>{stick.setPointerCapture(e.pointerId);moveStick(e)});
-stick.addEventListener('pointermove',e=>{if(stick.hasPointerCapture(e.pointerId))moveStick(e)});
-function stopStick(){setStick(0,0);knob.style.transform='translate(0,0)'}
-stick.addEventListener('pointerup',stopStick);stick.addEventListener('pointercancel',stopStick);
 let prev=performance.now(),accumulator=0;
 function loop(now){
  requestAnimationFrame(loop);
+ controlUI.tick();
  const dt=Math.min(.045,Math.max(0,(now-prev)/1000));prev=now;
  if(flight.started&&!flight.paused){
   accumulator+=dt;let steps=0;

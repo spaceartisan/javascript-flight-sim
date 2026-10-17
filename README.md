@@ -24,11 +24,11 @@ Three.js 0.168.0 is pinned via an import map and loaded from jsDelivr. An intern
 | Rudder left / right | Q / E |
 | Increase / decrease throttle | Shift / Ctrl (hold) |
 | Afterburner / throttle idle | R / T |
-| Wheel brakes | Space (hold while grounded) |
+| Wheel brakes | Space (hold while grounded), controller X, or mobile BRAKE (hold) |
 | Landing gear | G |
 | Flaps (0°, 12°, 25°) | F |
 | Target selection | Tab |
-| Launch locked RAZOR-9 missile | M or Enter |
+| Launch locked RAZOR-9 missile | M or Enter; controller A; mobile FIRE |
 | Camera (chase/cockpit/wing/tower) | V |
 | Compact / detailed flight HUD | F2 |
 | Stability assist | C |
@@ -53,6 +53,21 @@ Warnings use a **single priority annunciator** instead of stacking banners, and 
 4. Fly toward the radar contacts; Tab cycles selection. Align your nose until **IR LOCK ACQUIRED** and press M.
 5. Eliminate all three moving drones, return to Sierra runway, lower gear, choose flaps, reduce throttle, and land. Brake on rollout using Space. Stopping safely after all contacts are destroyed completes the sortie.
 6. If you crash, press Enter to restart.
+
+## Control overhaul (v0.5)
+
+**Mobile flight controls are now fully functional** instead of the original tiny fixed joystick.
+
+- **Floating flight stick:** touch and drag anywhere inside the large lower-left flight area. Slide right to bank right, left to bank left, drag down to pull the nose up, or drag up to dive. Stick returns to neutral automatically when released or when the app loses focus.
+- **Rudder pedals:** hold the left/right rudder buttons near the lower-left screen edge to steer and coordinate turns, including runway steering.
+- **Throttle quadrant:** use the touch slider for fine control; IDLE instantly reduces thrust and AB selects full afterburner. Throttle percentage stays synchronized with keyboard and gamepad inputs.
+- **Combat and systems:** FIRE and TARGET remain in a separate right-hand touch panel. Landing gear, flaps and BRAKE are all reachable while flying.
+- **Safety:** hold BRAKE on the runway; controls clear on touch cancellation, browser blur and pause; PAUSE displays a restart/resume dialog. Full-screen toggle is available where supported.
+- **Responsive layout:** landscape mobile places flight controls and action console at opposite corners; portrait moves the touch stick above the action console. Mobile hides oversized side panels, leaving the essential flight instruments visible.
+- **Adjustments:** Help → Control Response lets you invert the pitch axis, tune stick sensitivity (55–145%), tune dead zone (2–22%), and reset preferences. Settings persist in the browser.
+- **Gamepad support:** left stick controls pitch/roll, right stick X controls rudder, right/left triggers adjust throttle, A launches, B selects targets, X brakes, Y toggles gear, LB cycles flaps, RB changes camera, and Start toggles pause. D-pad up/down fine-tunes throttle. Inputs are edge-triggered for actions, and a disconnected pad releases its axes.
+
+The keyboard commands remain active; no user input mode must be chosen. The controls are tested with `node tests/controls.test.mjs` and included in `npm test`. This controller support uses the standard browser Gamepad API; individual button mappings can vary with unusual controllers.
 
 ## Flight model
 

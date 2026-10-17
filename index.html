@@ -36,8 +36,42 @@
  <footer class="footerbar glass"><div><span class="legend">W / S</span> PITCH <span class="legend">A / D</span> ROLL <span class="legend">Q / E</span> RUDDER <span class="legend">SHIFT / CTRL</span> THROTTLE</div><div><span class="legend">G</span> GEAR <span class="legend">F</span> FLAPS <span class="legend">SPACE</span> BRAKE <span class="legend">M</span> FIRE <span class="legend">V</span> VIEW</div></footer>
 </div>
 <div id="startScreen" class="overlay"><div class="overglow"></div><div class="intro-shell"><div class="intro-eyebrow"><span class="state-dot"></span> AERONAUT DIVISION <span class="hairline"></span> FLIGHT SIMULATION</div><h1>THE SKY<br>IS <i>YOURS.</i></h1><p class="intro-lead">A precision-driven tactical flight experience.<br>Light the afterburner. Own the runway. Control the engagement.</p><div class="intro-features"><span><b>01</b> FLIGHT DYNAMICS</span><span><b>02</b> TACTICAL COMBAT</span><span><b>03</b> FULL INSTRUMENTATION</span></div><div class="intro-bottom"><button id="startButton" class="primary">INITIATE FLIGHT <span>↗</span></button><div><b>F-27 KESTREL</b><small>SIERRA NAVAL AIR STATION <em>—</em> RUNWAY 36</small></div></div></div><div class="intro-sidebar"><div class="side-number">01 <span>/ 03</span></div><div class="side-rule"></div><span>TACTICAL AVIATION<br>TRAINING OPERATIONS</span></div></div>
-<div id="helpScreen" class="modal hidden"><div class="help-sheet glass"><button id="closeHelp" class="x">✕</button><div class="intro-eyebrow">PILOT OPERATIONS MANUAL <span class="hairline"></span> REV. 1</div><h2>FLIGHT CONTROLS</h2><div class="help-grid"><div><h3>FLIGHT</h3><p><kbd>W</kbd> / <kbd>↑</kbd> Pitch nose down</p><p><kbd>S</kbd> / <kbd>↓</kbd> Pitch nose up</p><p><kbd>A</kbd> / <kbd>D</kbd> Roll left / right</p><p><kbd>Q</kbd> / <kbd>E</kbd> Rudder left / right</p><p><kbd>Shift</kbd> / <kbd>Ctrl</kbd> Increase / decrease throttle</p><p><kbd>R</kbd> Full afterburner <kbd>T</kbd> Idle</p></div><div><h3>AIRCRAFT</h3><p><kbd>G</kbd> Landing gear toggle</p><p><kbd>F</kbd> Flaps (0° / 12° / 25°)</p><p><kbd>Space</kbd> Wheel brakes (hold)</p><p><kbd>V</kbd> Camera mode</p><p><kbd>U</kbd> Toggle sound</p><p><kbd>F2</kbd> Compact / detailed HUD</p><p><kbd>C</kbd> Flight stability assist</p><p><kbd>P</kbd> Pause simulation</p></div><div><h3>COMBAT & MISSION</h3><p><kbd>Tab</kbd> Next radar target</p><p><kbd>M</kbd> / <kbd>Enter</kbd> Launch missile</p><p>Acquire a target within 5 km and inside your forward seeker cone. Wait for the green LOCK indicator before firing.</p><p>Destroy three drones, then return and stop on the runway for rearm and mission completion.</p></div></div><div class="hint">TAKEOFF: HOLD SHIFT TO INCREASE THROTTLE · AT 145–165 KT, GENTLY HOLD S TO ROTATE · RAISE GEAR WHEN AIRBORNE</div></div></div>
-<div id="mobile" class="mobile"><div id="stickZone" class="stick-zone"><div class="stick-ring"><div id="stickKnob"></div></div><span>FLIGHT CONTROL</span></div><div class="mobile-right"><button id="mobileFire">FIRE</button><div class="mobile-actions"><button id="mobileGear">GEAR</button><button id="mobileFlaps">FLAPS</button><button id="mobileView">VIEW</button></div><label>THRUST <input id="mobileThrottle" type="range" min="0" max="100" value="0"></label></div></div>
+<div id="helpScreen" class="modal hidden"><div class="help-sheet glass"><button id="closeHelp" class="x">✕</button><div class="intro-eyebrow">PILOT OPERATIONS MANUAL <span class="hairline"></span> REV. 1</div><h2>FLIGHT CONTROLS</h2><div class="help-grid"><div><h3>FLIGHT</h3><p><kbd>W</kbd> / <kbd>↑</kbd> Pitch nose down</p><p><kbd>S</kbd> / <kbd>↓</kbd> Pitch nose up</p><p><kbd>A</kbd> / <kbd>D</kbd> Roll left / right</p><p><kbd>Q</kbd> / <kbd>E</kbd> Rudder left / right</p><p><kbd>Shift</kbd> / <kbd>Ctrl</kbd> Increase / decrease throttle</p><p><kbd>R</kbd> Full afterburner <kbd>T</kbd> Idle</p></div><div><h3>AIRCRAFT</h3><p><kbd>G</kbd> Landing gear toggle</p><p><kbd>F</kbd> Flaps (0° / 12° / 25°)</p><p><kbd>Space</kbd> Wheel brakes (hold)</p><p><kbd>Gamepad</kbd> Left stick pitch/roll · right stick rudder · triggers throttle · A fire · B target · X brake · Y gear · LB flaps · RB camera · Start pause</p><p><kbd>V</kbd> Camera mode</p><p><kbd>U</kbd> Toggle sound</p><p><kbd>F2</kbd> Compact / detailed HUD</p><p><kbd>C</kbd> Flight stability assist</p><p><kbd>P</kbd> Pause simulation</p></div><div><h3>COMBAT & MISSION</h3><p><kbd>Tab</kbd> Next radar target</p><p><kbd>M</kbd> / <kbd>Enter</kbd> Launch missile</p><p>Acquire a target within 5 km and inside your forward seeker cone. Wait for the green LOCK indicator before firing.</p><p>Destroy three drones, then return and stop on the runway for rearm and mission completion.</p></div></div><section class="control-config" aria-label="Control preferences">
+ <h3>CONTROL RESPONSE <span id="controllerStatus">KEYBOARD / TOUCH READY</span></h3>
+ <div class="config-grid">
+  <label class="config-toggle"><input type="checkbox" id="invertPitch"> Invert pitch axis</label>
+  <label>Stick sensitivity <output id="sensitivityValue">100%</output><input id="sensitivity" type="range" min="0.55" max="1.45" step="0.05" value="1"></label>
+  <label>Dead zone <output id="deadzoneValue">8%</output><input id="deadzone" type="range" min="0.02" max="0.22" step="0.01" value=".075"></label>
+  <button id="resetControls" type="button">RESET RESPONSE</button>
+ </div>
+ <p class="config-note">Mobile: drag anywhere in the left flight-control zone, use the rudder pedals to steer on the ground, hold BRAKE to stop, and slide throttle to take off. Pull downward to climb. On mobile, all flight controls work together with the right-side combat panel.</p>
+</section>
+<div class="hint">TAKEOFF: HOLD SHIFT OR INCREASE MOBILE THROTTLE · AT 145–165 KT, GENTLY PULL BACK · RAISE GEAR WHEN AIRBORNE</div></div></div>
+<div id="mobile" class="mobile mobile-v2" aria-label="Mobile flight controls">
+  <div id="stickZone" class="flight-touch-area" aria-label="Virtual flight stick. Drag left and right to roll, downward to pitch up.">
+    <div class="flight-control-caption">FLIGHT STICK <span>DRAG ANYWHERE HERE</span></div>
+    <div id="stickRing" class="floating-stick"><div class="stick-axis horizontal"></div><div class="stick-axis vertical"></div><div id="stickKnob" class="floating-stick-knob"></div></div>
+  </div>
+  <div class="rudder-pedals" aria-label="Rudder controls">
+    <button type="button" id="rudderLeft" aria-label="Hold for left rudder">◀ <span>RUDDER</span></button>
+    <button type="button" id="rudderRight" aria-label="Hold for right rudder"><span>RUDDER</span> ▶</button>
+  </div>
+  <div class="mobile-console" aria-label="Aircraft and combat actions">
+    <div class="mobile-contact"><span id="mobileTargetInfo">T1 · SELECTED</span><strong id="mobileLockInfo">SEARCHING</strong></div>
+    <div class="console-row attack-row"><button type="button" id="mobileTarget">◎ TARGET</button><button type="button" id="mobileFire">◈ FIRE</button></div>
+    <div class="console-row systems-row-mobile"><button type="button" id="mobileGear">GEAR ↓</button><button type="button" id="mobileFlaps">FLAPS 12°</button><button type="button" id="mobileBrake" aria-label="Hold to brake">BRAKE</button></div>
+    <div class="mobile-throttle"><button type="button" id="mobileIdle">IDLE</button><label for="mobileThrottle">THRUST <output id="mobileThrottleValue">0%</output><input id="mobileThrottle" type="range" min="0" max="100" step="1" value="0" aria-label="Throttle power"></label><button type="button" id="mobileAB">AB</button></div>
+    <div class="console-row utility-row"><button type="button" id="mobileView">◉ VIEW</button><button type="button" id="mobilePause">Ⅱ PAUSE</button><button type="button" id="mobileFullscreen" title="Toggle full screen">⛶</button></div>
+  </div>
+</div>
+<div id="pauseScreen" class="pause-screen hidden" role="dialog" aria-modal="true" aria-labelledby="pausedTitle">
+  <div class="pause-content glass">
+    <div class="intro-eyebrow">FLIGHT CONTROL SYSTEM</div>
+    <h2 id="pausedTitle">SIMULATION PAUSED</h2>
+    <p>All flight inputs are neutralized while paused.</p>
+    <div class="pause-actions"><button type="button" id="resumeFlight">RESUME FLIGHT</button><button type="button" id="restartFlight">RESTART SORTIE</button><button type="button" id="pauseHelp">CONTROLS</button></div>
+  </div>
+</div>
 <div id="toast" class="toast" role="status"></div>
 <script type="module" src="./main.js"></script>
 </body>

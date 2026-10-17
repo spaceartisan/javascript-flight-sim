@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {loadBlenderModels} from './models.js';
 export {THREE};
 export const V=(x=0,y=0,z=0)=>new THREE.Vector3(x,y,z);
 export const UP=V(0,1,0), FWD=V(0,0,-1);
@@ -61,13 +62,14 @@ for(let i=-1250;i<=1250;i+=100)box(airport,.35,.02,38,runwayPaint,side*28,.14,i)
 for(let i=-1200;i<=1200;i+=75){const light=box(airport,.8,.24,.8,new THREE.MeshBasicMaterial({color:i>0?'#fff1bc':'#b9e8ff'}),side*36,.28,i);light.castShadow=false}
 for(let j=0;j<6;j++){box(airport,2.5,.012,53,runwayPaint,side*(4+j*3),.14,1165);box(airport,2.5,.012,53,runwayPaint,side*(4+j*3),.14,-1165)}}
 for(let i=-1225;i<=1225;i+=70)box(airport,1.35,.012,30,runwayPaint,0,.14,i);
-for(let i=0;i<5;i++){const z=970-i*190;box(airport,85,25,96,concrete,380,12.55,z);box(airport,91,4,103,panel,380,27,z);
-box(airport,60,19,1,dark,380,10,z-48.2);for(let j=0;j<5;j++)box(airport,1,18,1,edge,352+j*14,10,z-48.8)}
+const fallbackStructures=new THREE.Group();airport.add(fallbackStructures);
+for(let i=0;i<5;i++){const z=970-i*190;box(fallbackStructures,85,25,96,concrete,380,12.55,z);box(fallbackStructures,91,4,103,panel,380,27,z);
+box(fallbackStructures,60,19,1,dark,380,10,z-48.2);for(let j=0;j<5;j++)box(fallbackStructures,1,18,1,edge,352+j*14,10,z-48.8)}
 const glass=mat('#263f50',.55,.31);
-box(airport,30,40,28,concrete,585,20,-85);box(airport,14,77,14,concrete,585,38.5,-85);
-box(airport,30,9,30,glass,585,82,-85);box(airport,2,19,2,edge,585,96,-85);
+box(fallbackStructures,30,40,28,concrete,585,20,-85);box(fallbackStructures,14,77,14,concrete,585,38.5,-85);
+box(fallbackStructures,30,9,30,glass,585,82,-85);box(fallbackStructures,2,19,2,edge,585,96,-85);
 for(let i=0;i<30;i++){const x=400+(i%7)*110,z=-700+Math.floor(i/7)*150,h=11+hash(i,8)*35;
-box(airport,12+hash(i,4)*11,h,14+hash(i,2)*14,hash(i,5)>.5?concrete:panel,x,h/2,z)}
+box(fallbackStructures,12+hash(i,4)*11,h,14+hash(i,2)*14,hash(i,5)>.5?concrete:panel,x,h/2,z)}
 // Sparse, rounded cloud clusters replace the repeated flat billboard-like ribbons.
 const cloudGeometry=new THREE.SphereGeometry(1,10,7);
 const cloudMat=new THREE.MeshLambertMaterial({color:'#e9f5f7',transparent:true,opacity:.27,depthWrite:false,side:THREE.FrontSide});
@@ -85,7 +87,8 @@ for(let i=0;i<22;i++){
 function poly(parent,points,material,thickness=.14){const s=new THREE.Shape();s.moveTo(points[0][0],points[0][1]);for(let i=1;i<points.length;i++)s.lineTo(points[i][0],points[i][1]);s.closePath();
 const g=new THREE.ExtrudeGeometry(s,{depth:thickness,bevelEnabled:true,bevelThickness:.04,bevelSize:.06,bevelSegments:1});
 g.rotateX(Math.PI/2);g.translate(0,thickness*.5,0);const m=new THREE.Mesh(g,material);m.castShadow=true;parent.add(m);return m}
-export function makeMissileModel(){const g=new THREE.Group(),body=new THREE.Mesh(new THREE.CylinderGeometry(.12,.16,2.5,10),white);
+let missilePrototype=null;
+export function makeMissileModel(){if(missilePrototype)return missilePrototype.clone(true);const g=new THREE.Group(),body=new THREE.Mesh(new THREE.CylinderGeometry(.12,.16,2.5,10),white);
 body.rotation.x=Math.PI/2;g.add(body);const tip=new THREE.Mesh(new THREE.ConeGeometry(.12,.46,10),edge);tip.rotation.x=-Math.PI/2;tip.position.z=-1.45;g.add(tip);
 for(let k=0;k<4;k++){const fin=box(g,.05,.46,.42,edge,0,0,.88);fin.rotation.z=k*Math.PI/2}return g}
 export function buildKestrel(){
@@ -132,3 +135,5 @@ poly(g,[[0,-1.7],[-1.1,-.6],[-6,2.7],[-5.8,3.2],[0,1.9]],droneMaterial,.12);
 const fin=new THREE.Mesh(new THREE.ConeGeometry(.75,2.5,3),red);fin.position.set(0,1.1,3);g.add(fin);
 scene.add(g);return {model:g,index:i,alive:true,angle:i*2.5+.3,
 center:V([300,-2100,1400][i],0,[-3100,-4600,-5300][i]),radius:[650,900,850][i],altitude:[1050,1300,1550][i],speed:[.21,.15,.17][i]}});
+// Blender GLBs are the real in-game art; only use the older procedural geometry until loaded.
+export const modelLoadStatus=loadBlenderModels({scene,airport,aircraft,drones,height,fallbackStructures,onMissile(model){missilePrototype=model}});

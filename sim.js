@@ -39,8 +39,8 @@ export function fireMissile(){
  const d=getTarget(),sol=targetSolution(d);
  if(!flight.missiles){effects.notify('STORES EMPTY — LAND TO REARM');effects.chirp(220,.2);return}
  if(!d||!sol.lock){effects.notify('NO MISSILE LOCK — POINT NOSE AT CONTACT');effects.chirp(220,.13);return}
- const station=[[-3.55,.9],[3.55,.9],[-5.55,1.6],[5.55,1.6]][4-flight.missiles];
- const m=makeMissileModel();m.position.copy(flight.pos).add(V(station[0],-.6,station[1]).applyQuaternion(flight.q));
+ const station=[[-3.55,-1.0],[3.55,-1.0],[-5.55,-.8],[5.55,-.8]][4-flight.missiles];
+ const m=makeMissileModel();m.position.copy(flight.pos).add(V(station[0],-.75,station[1]).applyQuaternion(flight.q));
  m.quaternion.copy(flight.q);scene.add(m);
  const dir=FWD.clone().applyQuaternion(flight.q);
  missiles.push({model:m,vel:flight.vel.clone().addScaledVector(dir,150),target:d,age:0});
@@ -166,7 +166,19 @@ export function updateFlight(dt){
 export function syncAircraft(){
  aircraft.position.copy(flight.pos);aircraft.quaternion.copy(flight.q);aircraft.userData.gear.visible=flight.gear;
  const power=clamp((flight.spool-.67)/.33,0,1);
- aircraft.userData.flames.forEach(f=>{f.visible=power>.01;f.scale.set(1+power*.45,1+power*.15,1);f.material.opacity=.14+power*.68;f.material.color.set(power>.58?'#a9eaff':'#488ebc')});
+ aircraft.userData.flames.forEach(f=>{
+  f.visible=power>.01;
+  f.scale.set(1+power*.24,1+power*.24,1+power*.70);
+  // Procedural fallback flames are meshes; Blender-authored engines are named groups.
+  f.traverse(o=>{
+   if(!o.isMesh||!o.material)return;
+   const mats=Array.isArray(o.material)?o.material:[o.material];
+   for(const material of mats){
+    if(material.opacity!==undefined)material.opacity=.13+power*.47;
+    if(material.color)material.color.set(power>.58?'#a9eaff':'#488ebc');
+   }
+  });
+ });
  shadowDisc.position.set(flight.pos.x,height(flight.pos.x,flight.pos.z)+.12,flight.pos.z);
  shadowDisc.scale.setScalar(clamp(1-(flight.pos.y-height(flight.pos.x,flight.pos.z))/2200,.1,1));
  sky.position.copy(flight.pos);sun.position.set(flight.pos.x-4200,flight.pos.y+6500,flight.pos.z-5200);sun.target.position.copy(flight.pos);sun.target.updateMatrixWorld();

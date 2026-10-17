@@ -47,4 +47,34 @@ assert(sim.includes('effects.complete()')&&sim.includes('effects.gear()'),'Missi
 assert(html.includes('Toggle sound'),'Help must document mute action');
 assert(fs.existsSync(new URL('../tools/render-generaluser.py',import.meta.url)),'SF2 renderer source missing');
 assert(fs.existsSync(new URL('../assets/audio/README.md',import.meta.url)),'SoundFont attribution missing');
-console.log('AERONAUT static validation passed (including depth, HUD & GeneralUser GS audio checks).');
+// Real Blender model exports are runtime assets — verify the GLB containers and node contracts.
+const models=read('models.js');
+assert(html.includes('three/addons/'), 'Missing GLTFLoader import map');
+assert(world.includes("import {loadBlenderModels} from './models.js'"),'World must load real Blender kit');
+assert(world.includes('modelLoadStatus=loadBlenderModels'), 'Blender art not integrated into the scene');
+assert(models.includes('new GLTFLoader()')&&models.includes('loadAsync'),'GLB loading must happen at runtime');
+assert(models.includes('fallbackStructures.visible=false'),'Legacy buildings must hide after Blender kit loads');
+assert(models.includes("source.getObjectByName('Gear')"),'Landing gear attachment not integrated');
+assert(models.includes('aircraft.userData.flames=flames'),'Afterburner attach points not integrated');
+assert(sim.includes('f.traverse(o=>'),'Blender flame groups not compatible with flight simulation');
+const expected={
+ 'kestrel-hd.glb':['KESTREL','Gear','Store_0','Store_1','Store_2','Store_3','Flame_L','Flame_R'],
+ 'skua-drone-hd.glb':['SKUA_UAV'],
+ 'razor9-missile-hd.glb':['RAZOR9_IR'],
+ 'airfield-kit-hd.glb':['AIRFIELD_KIT','Hangar','Tower','Operations','FuelTank','RadarStation','ServiceCart','EquipmentPallet','PAPI','TaxiSign','Rock','Conifer','Bush']
+};
+for(const [filename,names] of Object.entries(expected)){
+ const buffer=fs.readFileSync(new URL('../assets/models/'+filename, import.meta.url));
+ assert.equal(buffer.toString('ascii',0,4),'glTF', 'invalid GLB signature: '+filename);
+ assert.equal(buffer.readUInt32LE(4),2,'not glTF 2.0: '+filename);
+ assert.equal(buffer.readUInt32LE(8),buffer.length,'GLB byte length mismatch: '+filename);
+ assert.equal(buffer.toString('ascii',16,20),'JSON','first GLB chunk must be JSON: '+filename);
+ const jsonLength=buffer.readUInt32LE(12);
+ const scene=JSON.parse(buffer.subarray(20,20+jsonLength).toString('utf8'));
+ const namesPresent=new Set(scene.nodes.map(n=>n.name||''));
+ for(const name of names)assert(namesPresent.has(name),filename+' missing Blender object '+name);
+ assert((scene.meshes||[]).length>8,filename+' appears to contain placeholder geometry');
+}
+assert(fs.existsSync(new URL('../assets/models/aeronaut-assets.blend',import.meta.url)),'Editable Blender source missing');
+assert(fs.existsSync(new URL('../tools/build-model-library.py',import.meta.url)),'Reproducible Blender generator missing');
+console.log('AERONAUT static validation passed (including GeneralUser GS audio and live Blender art integration).');

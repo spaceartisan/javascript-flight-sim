@@ -70,11 +70,27 @@ All forces and motion are integrated in **SI units** at a fixed 90 Hz step. The 
 
 Physics shortcuts/known limitations: no detailed engine inlet model, no atmospheric turbulence, no ground effect, no sophisticated landing-gear suspension, no damage accumulation, no multiplayer, and no AI enemy weapons. The HUD uses approximate magnetic heading and uncalibrated airspeed. The world is a fictional training airbase.
 
+## Blender-authored visual overhaul (v0.2)
+
+The aircraft, drones, missile model, main airbase architecture, ground service equipment and environmental props now come from **actual Blender-exported GLB files loaded directly by the running Three.js game**. This replaces the previous in-browser procedural art, rather than merely distributing separate sample models.
+
+The source `assets/models/aeronaut-assets.blend` is an editable Blender 5.2.1 scene, generated and exportable with `tools/build-model-library.py`. Full model and runtime integration details: [assets/models/README.md](assets/models/README.md).
+
+The airfield uses a 12-module Blender kit — detailed hangars, an octagonal control tower, operations building, fuel tanks, radar, service carts, maintenance crates, airfield signs, precision approach indicator housings, rocks, bushes, and conifers. Existing runway and terrain geometry stays procedural because it feeds the collision/flight model, but visible aircraft/structure/prop geometry is now authored in Blender.
+
+- `models.js`: asynchronous GLB loading, pilot aircraft replacement, attachment rebinds, drone and missile swaps, modular airbase population and source-geometry fallback.
+- `assets/models/*.glb`: four production aircraft/drone/missile/architecture assets.
+- `assets/models/aeronaut-assets.blend`: editable source geometry and materials.
+- `tools/build-model-library.py`: reproducible Blender authoring and glTF export.
+- `tools/render-preview.py`: studio preview renders of the real Blender exports.
+
+Shaders and realistic environment can still be improved further (texture atlases, ground clutter LOD, cockpit interior). The model swap preserves physics and gameplay.
+
 ## Project structure
 
 - `index.html` — flight deck UI, help/manual, mobile controls and import map.
 - `styles.css` — responsive aviation UI design.
-- `world.js` — procedural terrain, runway, airbase, clouds, fighters, drone meshes and lighting.
+- `world.js` — procedural terrain/runway/lighting, temporary geometry fallbacks, and entry point for Blender GLB integration.
 - `sim.js` — flight equations, controls, landing state, AI tracks, guided missiles and mission logic.
 - `main.js` — rendering loop, sound runtime, camera, radar, input and live HUD.
 - `assets/mark.svg` and `assets/concrete.svg` — scale-independent vector UI/airfield assets. Designed to be editable with **Inkscape** and raster-exportable/editable with **Krita/GIMP**.
@@ -97,7 +113,7 @@ For the audio source use:
 csound -d -W -o assets-preview.wav tools/aeronaut-soundbank.csd
 ```
 
-The Blender export is a source-model development asset, not an in-game imported GLB in this revision.
+The Blender export is now used in-game as imported GLB artwork; Blender remains the authoritative editable geometry source.
 
 ### GeneralUser GS v2.0.3 sound upgrade (v0.1.2)
 

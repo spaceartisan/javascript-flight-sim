@@ -225,3 +225,7 @@
 
 /* Startup must remain tappable: mobile controls mount after the intro in DOM order. */
 #startScreen{z-index:10}
+
+/* Final screenshot QA: mobile portrait label collision and unsupported fullscreen glyph. */
+.mobile-console #mobileFullscreen{font:700 10px DM Mono,monospace;letter-spacing:.05em}
+@media (max-width:650px) and (orientation:portrait){.mobile-v2 .flight-control-caption{display:none}}

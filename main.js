@@ -26,8 +26,15 @@ effects.complete=()=>sound.complete();
 function cycleView(){cameraMode=(cameraMode+1)%4;notify('CAMERA / '+cameraModes[cameraMode]);$('cameraName').textContent=cameraModes[cameraMode]}
 function toggleHUD(){
  const compact=$('hud').classList.toggle('compact');
- $('hudModeButton').textContent=compact?'▣ FULL HUD':'▤ COMPACT HUD';
- notify(compact?'COMPACT HUD / F2 TO EXPAND':'FULL INSTRUMENTS / F2 TO COMPACT');
+ $('hudModeButton').textContent=compact?'▣ INSTRUMENTS':'▤ MINIMAL';
+ notify(compact?'MINIMAL FLIGHT DISPLAY':'FULL INSTRUMENTS');
+}
+function toggleRadar(force){
+ const hud=$('hud');
+ const open=typeof force==='boolean'?force:!hud.classList.contains('radar-open');
+ hud.classList.toggle('radar-open',open);
+ $('mobileRadar').setAttribute('aria-pressed',String(open));
+ $('mobileRadar').classList.toggle('selected',open);
 }
 function updateCamera(dt){
  const q=flight.q,pos=flight.pos,desired=new THREE.Vector3(),focus=pos.clone();
@@ -79,6 +86,13 @@ function updateHUD(){
  $('fuelText').textContent=Math.round(flight.fuel)+'%';$('fuelBar').style.width=flight.fuel+'%';
  $('gearBadge').innerHTML='GEAR <b '+(!flight.gear?'class="warn"':'')+'>'+(flight.gear?'DOWN':'UP')+'</b>';
  $('flapsBadge').innerHTML='FLAPS <b>'+[0,12,25][flight.flaps]+'°</b>';
+ $('briefGear').textContent=flight.gear?'GEAR DN':'GEAR UP';
+ $('briefGear').classList.toggle('down',flight.gear);
+ $('briefFlaps').textContent='FLAPS '+[0,12,25][flight.flaps]+'°';
+ $('briefPower').textContent=(flight.spool>.84?'AB ':'N1 ')+Math.round(flight.spool*100)+'%';
+ $('briefPower').classList.toggle('afterburner',flight.spool>.84);
+ $('briefFuel').textContent='FUEL '+Math.round(flight.fuel)+'%';
+ $('briefFuel').classList.toggle('warning',flight.fuel<16);
  $('brakeBadge').innerHTML='BRAKE <b class="'+(flight.brake?'warn':'')+'">'+(flight.brake?'ON':'OFF')+'</b>';
  $('ammo').textContent=String(flight.missiles).padStart(2,'0')+' / 04 MISSILES';
  $('kills').textContent=String(flight.kills).padStart(2,'0');
@@ -96,6 +110,13 @@ function updateHUD(){
  for(const [id,offset] of [['hdgLeft',-60],['hdgCenter',-30],['hdgRight',30],['hdgFar',60]])
   $(id).textContent=String(angle360(hdg+offset)).padStart(3,'0');
  const d=getTarget(),sol=targetSolution(d);flight.lock=sol.lock;
+ const targetPresent=Boolean(d);
+ $('compactContact').classList.toggle('clear',!targetPresent);
+ $('compactContact').classList.toggle('locked',sol.lock);
+ $('briefContact').textContent=targetPresent?'T'+String(d.index+1).padStart(2,'0'):'CLEAR';
+ $('briefDistance').textContent=targetPresent?(sol.range/1000).toFixed(1)+' KM':'RTB';
+ $('briefSeeker').textContent=!targetPresent?'AIRSPACE CLEAR':sol.lock?'● LOCK':'○ SEEK';
+ $('briefAmmo').textContent=String(flight.missiles).padStart(2,'0')+' MSL';
  if(sol.lock)sound.lock();else sound.unlock();
  if(d){
   $('targetInfo').innerHTML='<span>CONTACT '+String(d.index+1).padStart(2,'0')+' / UAV</span><b>'+(sol.range/1000).toFixed(2)+' KM</b>';
@@ -144,7 +165,7 @@ function togglePause(forced){
 }
 const controlUI=installControlUI({
  flight,keys,fireMissile,selectTarget,toggleGear,cycleFlaps,cycleView,togglePause,
- restart:resetFlight,openHelp:showHelp,notify
+ toggleRadar,restart:resetFlight,openHelp:showHelp,notify
 });
 const prevent=['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','Tab','ShiftLeft','ShiftRight','ControlLeft','ControlRight'];
 document.addEventListener('keydown',e=>{
@@ -157,6 +178,7 @@ document.addEventListener('keydown',e=>{
  if(!flight.started)return;
  if(e.code==='Enter'&&flight.crashed){resetFlight();notify('NEW SORTIE — AIRCRAFT RESET');return}
  if(e.code==='F2'){e.preventDefault();toggleHUD()}
+ if(e.code==='KeyJ'){toggleRadar();return}
  if(e.code==='KeyG')toggleGear();
  if(e.code==='KeyF')cycleFlaps();
  if(e.code==='KeyV')cycleView();

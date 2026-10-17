@@ -2,11 +2,11 @@
 import {clamp,settings,defaults,updateSettings,setTouchAxes,setTouchRudder,setTouchBrake,releaseTouch,pollGamepad,gamepad} from './controls.js';
 const $=id=>document.getElementById(id);
 
-export function installControlUI({flight,keys,fireMissile,selectTarget,toggleGear,cycleFlaps,cycleView,togglePause,restart,openHelp,notify}){
+export function installControlUI({flight,keys,fireMissile,selectTarget,toggleGear,cycleFlaps,cycleView,togglePause,toggleRadar,restart,openHelp,notify}){
  const zone=$('stickZone'),ring=$('stickRing'),knob=$('stickKnob');
  const slider=$('mobileThrottle'),throttleOut=$('mobileThrottleValue');
  const left=$('rudderLeft'),right=$('rudderRight'),brake=$('mobileBrake');
- let stickId=null,origin={x:0,y:0},lastThrottle=-1,step=0;
+ let stickId=null,origin={x:0,y:0},lastThrottle=-1,systemsManual=false;
  const rudderPointers=new Map(),brakePointers=new Set();
  function visualStick(x,y,active=false){
   if(active){
@@ -79,9 +79,26 @@ export function installControlUI({flight,keys,fireMissile,selectTarget,toggleGea
  $('mobileGear').addEventListener('click',toggleGear);
  $('mobileFlaps').addEventListener('click',cycleFlaps);
  $('mobileView').addEventListener('click',cycleView);
+ $('mobileRadar').addEventListener('click',()=>toggleRadar());
+ const systemToggle=$('mobileSystems'),consoleBox=document.querySelector('.mobile-console');
+ systemToggle.addEventListener('click',()=>{
+  systemsManual=!systemsManual;
+  systemToggle.setAttribute('aria-pressed',String(systemsManual));
+  systemToggle.classList.toggle('selected',systemsManual);
+  updateSystemVisibility();
+ });
+ function updateSystemVisibility(){
+  // Keep landing gear/brake controls present at takeoff and on approach.
+  const approach=!flight.airborne||flight.pos.y<350||flight.gear;
+  consoleBox.classList.toggle('systems-visible',approach||systemsManual);
+ }
  $('mobilePause').addEventListener('click',()=>togglePause());
  $('resumeFlight').addEventListener('click',()=>togglePause(false));
- $('restartFlight').addEventListener('click',()=>{restart();togglePause(false);syncThrottle(true);notify('NEW SORTIE — READY')});
+ $('restartFlight').addEventListener('click',()=>{
+  systemsManual=false;systemToggle.setAttribute('aria-pressed','false');
+  systemToggle.classList.remove('selected');restart();togglePause(false);syncThrottle(true);
+  updateSystemVisibility();notify('NEW SORTIE — READY');
+ });
  $('pauseHelp').addEventListener('click',openHelp);
  $('mobileFullscreen').addEventListener('click',async()=>{
   try{
@@ -130,6 +147,7 @@ export function installControlUI({flight,keys,fireMissile,selectTarget,toggleGea
   tickGamepad();
   if(!flight.started)return;
   syncThrottle();
+  updateSystemVisibility();
   $('mobileGear').textContent=flight.gear?'GEAR ↓':'GEAR ↑';
   $('mobileFlaps').textContent='FLAPS '+[0,12,25][flight.flaps]+'°';
   $('mobileTargetInfo').textContent='CONTACT '+(flight.selected+1)+' · '+(3-flight.kills)+' LIVE';

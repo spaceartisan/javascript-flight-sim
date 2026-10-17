@@ -146,4 +146,17 @@ assert(touch.includes('zone.setPointerCapture')&&touch.includes('flightMove'),'f
 assert(touch.includes("rudderPointers")&&touch.includes("mobileThrottle"),'multi-touch cockpit controls missing');
 assert(touch.includes('resetTransient')&&touch.includes('resetFlight')===false,'touch cleanup missing or simulation tightly coupled');
 assert(fs.existsSync(new URL('./controls.test.mjs', import.meta.url)),'deterministic control tests missing');
-console.log('AERONAUT validation passed: flight model, art, audio, terrain and keyboard/mobile/gamepad controls.');
+// v0.6: default HUD shows flight essentials, not four permanent panels.
+for(const id of ['miniStatus','briefGear','briefFlaps','briefPower','briefFuel',
+  'compactContact','briefContact','briefDistance','briefSeeker','briefAmmo',
+  'mobileRadar','mobileSystems']){
+ assert(html.includes('id="'+id+'"'),'minimal HUD output or toggle missing '+id);
+}
+assert(html.includes('class="hud hidden compact"'),'minimal mode must be initial flight HUD');
+assert(main.includes("function toggleRadar("),'context radar visibility missing');
+assert(main.includes("compactContact") && main.includes("briefSeeker"),'compact combat readout not updated in flight');
+assert(touch.includes('updateSystemVisibility'),'mobile systems must be contextual');
+assert(touch.includes("flight.pos.y<350"),'ground/approach landing controls must stay visible');
+assert(css.includes(".hud.compact .right-column{display:none}"),'full-sized weapons panel cannot be permanent in minimal mode');
+assert(css.includes(".mobile-v2 .mobile-console.systems-visible .systems-row-mobile"),'mobile systems expansion missing');
+console.log('AERONAUT validation passed: models, materials, aerodynamics, sound, multi-device controls and low-obstruction HUD.');

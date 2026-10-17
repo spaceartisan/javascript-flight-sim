@@ -34,6 +34,23 @@ async function testMode(name,viewport,isMobile){
    assert(visible.dock.width>75,name+' throttle too narrow');
    assert(visible.actions.width>50,name+' fire action too narrow');
    assert(visible.stick.width>120,name+' flight touch area too narrow');
+   // The control dock must not consume most of the screen.
+   const cockpit=await page.evaluate(()=>{
+    const bounds=id=>document.getElementById(id).getBoundingClientRect();
+    const dock=bounds('mobile').height; // overlay container spans viewport
+    const consoleBox=document.querySelector('.mobile-console').getBoundingClientRect();
+    const contact=getComputedStyle(document.getElementById('compactContact'));
+    return {height:consoleBox.height,width:consoleBox.width,
+      contactDisplay:contact.display,radarHidden:getComputedStyle(document.querySelector('.hud .left-column')).display==='none'};
+   });
+   assert(cockpit.height<215,name+' control dock exceeds screen-space budget: '+JSON.stringify(cockpit));
+   assert(cockpit.contactDisplay!=='none',name+' compact targeting strip hidden');
+   assert(cockpit.radarHidden,name+' full-size radar visible before requested');
+   await page.locator('#mobileRadar').click();
+   assert(await page.locator('#hud').evaluate(e=>e.classList.contains('radar-open')),name+' radar drawer did not open');
+   await page.locator('#mobileRadar').click();
+   assert(!(await page.locator('#hud').evaluate(e=>e.classList.contains('radar-open'))),name+' radar drawer did not close');
+   assert(await page.locator('.mobile-console').evaluate(e=>e.classList.contains('systems-visible')),name+' ground systems must appear for takeoff');
    const zone=await page.locator('#stickZone').boundingBox();
    assert(zone,name+' touch region not rendered');
    const origin={x:zone.x+Math.min(90,zone.width*.25),y:zone.y+Math.min(70,zone.height*.3)};

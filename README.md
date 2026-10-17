@@ -54,6 +54,19 @@ Warnings use a **single priority annunciator** instead of stacking banners, and 
 5. Eliminate all three moving drones, return to Sierra runway, lower gear, choose flaps, reduce throttle, and land. Brake on rollout using Space. Stopping safely after all contacts are destroyed completes the sortie.
 6. If you crash, press Enter to restart.
 
+## Minimal flight display (v0.6)
+
+The default **MINIMAL** cockpit prioritizes the view out of the aircraft:
+- Small IAS and altitude gauges at the upper left; compass tape above the flight path, reduced attitude markers in the middle.
+- Contextual landing/status indicators for gear, flaps, engine spool and fuel.
+- One compact target/range/seeker/ammo readout instead of a large permanent weapons panel.
+- Desktop has a small translucent radar; press **J** to toggle it. On mobile, tactical radar is hidden until pressing **RADAR**, and then appears as a compact overlay.
+- **F2** toggles the full instrument display without changing flight state.
+- Mobile controls use a smaller, translucent right-hand dock; SYS reveals extra aircraft actions during cruise. Ground/approach automatically keeps gear, flaps and hold-to-brake accessible.
+- Central flight-reference geometry is shorter, dimmer and has no full-screen horizon tint or giant pitch circle. Alerts remain prioritized over decorative HUD elements.
+
+The browser smoke suite validates desktop, landscape phone and portrait phone layout and controls. This is an information hierarchy/space-efficiency update, not a change to aircraft aerodynamics.
+
 ## Control overhaul (v0.5)
 
 **Mobile flight controls are now fully functional** instead of the original tiny fixed joystick.

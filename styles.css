@@ -229,3 +229,195 @@
 /* Final screenshot QA: mobile portrait label collision and unsupported fullscreen glyph. */
 .mobile-console #mobileFullscreen{font:700 10px DM Mono,monospace;letter-spacing:.05em}
 @media (max-width:650px) and (orientation:portrait){.mobile-v2 .flight-control-caption{display:none}}
+
+
+/* v0.6 FLIGHT-DECK UI — minimal by default. Mission and systems remain in F2. */
+.mini-status,.compact-contact{display:none}
+.hud.compact .topbar{
+ top:9px;left:13px;right:13px;height:27px;padding:0 2px;
+ background:transparent;border:0;box-shadow:none;backdrop-filter:none;
+}
+.hud.compact .brand{min-width:0;gap:6px}
+.hud.compact .brand-icon{display:none}
+.hud.compact .brand b{font:700 14px/1 'Barlow Condensed',sans-serif;letter-spacing:.17em;color:rgba(231,251,241,.78);text-shadow:0 1px 4px #142c2c}
+.hud.compact .brand small{display:none}
+.hud.compact .topactions button{
+ background:rgba(5,26,34,.48);border:1px solid rgba(147,226,199,.19);
+ padding:5px 9px;border-radius:4px;color:#b8decc;font-size:9px;
+}
+.hud.compact .flight-data{
+ top:40px;left:13px;border-radius:4px;background:rgba(4,22,31,.36);
+ border:1px solid rgba(172,231,210,.12);box-shadow:none;backdrop-filter:blur(4px);
+}
+.hud.compact .data-cell{min-width:83px;padding:6px 11px 8px;border-color:rgba(159,244,205,.11)}
+.hud.compact .data-cell:nth-child(3),.hud.compact .data-cell:nth-child(4){display:none}
+.hud.compact .data-cell strong{font:700 28px/.96 Barlow Condensed,sans-serif;letter-spacing:.025em;margin-top:2px}
+.hud.compact .data-cell small{font-size:9px;letter-spacing:.05em}
+.hud.compact .data-cell .datum-sub{font-size:8px}
+.hud.compact .data-bar{height:2px;margin-top:3px}
+.hud.compact .heading-tape{top:18px;width:232px;gap:8px;justify-content:space-between;font:10px DM Mono,monospace;color:rgba(170,244,207,.5)}
+.hud.compact .heading-tape strong{font-size:17px;padding:5px 8px 2px;border-top-width:1px;background:rgba(8,27,32,.2)}
+.hud.compact .attitude{width:min(340px,60vw);height:240px;top:49%;opacity:.80}
+.hud.compact .pitch-circle{display:none}
+.hud.compact .horizon-line{left:calc(50% - 104px);right:auto;width:208px;border-top:1px solid rgba(170,253,211,.54);box-shadow:0 1px 4px #1e5242}
+.hud.compact .skyshade,.hud.compact .groundshade{background:none;border:0}
+.hud.compact .pitch-line{opacity:.44;width:48px;left:calc(50% - 24px);font-size:8px;height:7px}
+.hud.compact .pitch-line.p20,.hud.compact .pitch-line.m20{display:none}
+.hud.compact .flight-reference{gap:8px;opacity:.87}
+.hud.compact .left-wing,.hud.compact .right-wing{width:42px;height:10px;border-top-width:2px;border-right-width:2px}
+.hud.compact .right-wing{border-left-width:2px}
+.hud.compact .flight-box{width:8px;height:5px;border-width:1px}
+.hud.compact .flight-path{font-size:18px}
+.hud.compact .flight-center{display:none}
+.hud.compact .hud-low{bottom:54px;top:auto;color:rgba(183,238,208,.72);font:9px DM Mono,monospace;letter-spacing:.055em}
+.hud.compact .hud-low span+span{display:none}
+.hud.compact .left-column{left:14px;bottom:13px;width:134px}
+.hud.compact .right-column{display:none}
+.hud.compact .radar-panel{padding:7px 9px 5px;background:rgba(3,23,30,.47);border:1px solid rgba(153,238,205,.14);box-shadow:none;backdrop-filter:blur(4px)}
+.hud.compact .radar-panel .panel-title{font-size:8px;color:rgba(178,235,212,.75);letter-spacing:.08em}
+.hud.compact .radar-panel .panel-title span{font-size:8px}
+.hud.compact .radar-panel #radar{width:110px;max-width:110px;margin:3px auto 0}
+.hud.compact .radar-foot{display:none}
+.hud.compact .mission-panel,.hud.compact .systems-panel,.hud.compact .weapons-panel{display:none}
+.hud.compact .footerbar{display:none}
+.hud.compact .mini-status{
+ display:flex;position:absolute;right:16px;top:48px;gap:8px;align-items:center;
+ color:#b1dbcd;font:9px DM Mono,monospace;letter-spacing:.035em;
+ text-shadow:0 1px 4px #05191d;white-space:nowrap
+}
+.hud.compact .mini-status span{opacity:.84}
+.hud.compact .mini-status span:not(:first-child)::before{content:'·';margin-right:8px;color:rgba(159,220,193,.37)}
+.hud.compact .mini-status .down{color:#d2f7e2}
+.hud.compact .mini-status .warning,.hud.compact .mini-status .afterburner{color:#ffd194;opacity:1}
+.hud.compact .compact-contact{
+ display:flex;position:absolute;left:50%;bottom:24px;transform:translateX(-50%);
+ align-items:center;justify-content:center;gap:10px;min-width:225px;max-width:calc(100vw - 330px);
+ padding:6px 12px;background:rgba(4,24,29,.37);
+ border:1px solid rgba(148,243,197,.15);border-radius:4px;
+ font:10px DM Mono,monospace;color:#afdac6;text-shadow:0 1px 4px #06191f;white-space:nowrap;
+}
+.hud.compact .compact-contact strong{font-weight:500;color:#e1ffe9}
+.hud.compact .compact-contact #briefSeeker{color:#e5bf86}
+.hud.compact .compact-contact.locked{border-color:rgba(135,255,191,.62);background:rgba(8,56,40,.63)}
+.hud.compact .compact-contact.locked #briefSeeker{color:#9fffc5}
+.hud.compact .compact-contact.clear #briefSeeker{color:#9fffc5}
+.hud.compact .alerts{top:112px;font-size:10px;max-width:310px}
+.hud.compact ~ .toast{top:106px;max-width:260px}
+/* In full-instrument mode these extra minimal annotations stay out of the way. */
+@media(max-width:980px), (pointer:coarse){
+ .hud.compact .topbar{display:none}
+ .hud.compact .flight-data{top:8px;left:9px;border-radius:3px}
+ .hud.compact .data-cell{min-width:64px;padding:5px 8px}
+ .hud.compact .data-cell strong{font-size:24px}
+ .hud.compact .data-cell small{font-size:8px}
+ .hud.compact .heading-tape{top:12px;width:172px;font-size:8px}
+ .hud.compact .heading-tape strong{font-size:15px;padding:4px 5px 1px}
+ .hud.compact .mini-status{
+  right:9px;top:12px;flex-direction:column;gap:5px;align-items:flex-end;
+  font-size:8px;line-height:1.05;background:rgba(5,26,31,.24);padding:4px 0;
+ }
+ .hud.compact .mini-status span:not(:first-child)::before{display:none}
+ .hud.compact .mini-status #briefFlaps{display:none}
+ .hud.compact .compact-contact{
+  top:58px;bottom:auto;padding:4px 8px;gap:6px;min-width:0;max-width:90vw;
+  font-size:9px;background:rgba(3,23,31,.32);border-color:rgba(165,245,208,.1)
+ }
+ .hud.compact .compact-contact strong{font-size:10px}
+ .hud.compact .attitude{width:230px;height:190px;top:49%}
+ .hud.compact .horizon-line{left:calc(50% - 69px);width:138px}
+ .hud.compact .pitch-line{width:36px;left:calc(50% - 18px)}
+ .hud.compact .left-wing,.hud.compact .right-wing{width:26px;height:7px}
+ .hud.compact .hud-low{display:none}
+ .hud.compact .left-column,.hud.compact .right-column{display:none}
+ .hud.compact.radar-open .left-column{
+  display:block;left:9px;top:92px;bottom:auto;width:125px;
+ }
+ .hud.compact.radar-open .radar-panel{display:block}
+ .hud.compact.radar-open .radar-panel #radar{width:102px;max-width:102px}
+ .hud.compact .alerts{top:88px;max-width:66vw}
+ .toast,.hud.compact ~ .toast{
+  top:99px;right:9px;left:auto;max-width:220px;font-size:9px;
+  padding:7px 9px;opacity:.84;
+ }
+ .mobile-v2 .flight-control-caption{font-size:9px;color:rgba(184,255,215,.6)}
+ .mobile-v2 .floating-stick{width:110px;height:110px;opacity:.2;box-shadow:none}
+ .mobile-v2 .floating-stick.active{opacity:.95}
+ .mobile-v2 .floating-stick-knob{width:44px;height:44px;border-width:1px}
+ .mobile-v2 .flight-touch-area{height:50vh;width:44vw}
+ .mobile-v2 .rudder-pedals button{min-width:76px;height:33px;opacity:.69}
+ .mobile-v2 .rudder-pedals button.pressed{opacity:1}
+ .mobile-v2 .mobile-console{
+  width:min(249px,43vw);padding:7px;gap:5px;
+  background:rgba(3,20,26,.59);border-color:rgba(154,229,195,.27);
+  border-radius:7px;box-shadow:0 10px 28px rgba(0,0,0,.15);
+ }
+ .mobile-v2 .mobile-contact{display:none}
+ .mobile-v2 .mobile-console button{font-size:9px;border-color:rgba(135,185,180,.4)}
+ .mobile-v2 .attack-row button{min-height:40px;font-size:12px}
+ .mobile-v2 .systems-row-mobile{display:none}
+ .mobile-v2 .mobile-console.systems-visible .systems-row-mobile{display:flex}
+ .mobile-v2 .systems-row-mobile button{min-height:32px;font-size:9px}
+ .mobile-v2 .mobile-throttle button{flex-basis:37px;min-height:35px}
+ .mobile-v2 .mobile-throttle label{font-size:9px}
+ .mobile-v2 .mobile-throttle input[type=range]{height:18px}
+ .mobile-v2 .utility-row button{min-height:29px;font-size:8px;padding:6px 2px}
+ .mobile-v2 .utility-row #mobileFullscreen{flex:1;font-size:9px}
+ .mobile-v2 .utility-row button.selected{border-color:#9effce;background:rgba(39,91,76,.73)}
+}
+@media(max-width:650px) and (orientation:portrait){
+ .hud.compact .flight-data{left:8px;top:9px}
+ .hud.compact .data-cell{min-width:69px;padding:6px 8px}
+ .hud.compact .heading-tape{top:71px;width:min(215px,72vw)}
+ .hud.compact .mini-status{right:9px;top:12px;font-size:9px}
+ .hud.compact .compact-contact{top:112px;font-size:9px;max-width:86vw}
+ .hud.compact .attitude{top:47%;width:220px;height:185px}
+ .hud.compact .alerts{top:142px}
+ .mobile-v2 .mobile-console{
+  bottom:calc(7px + env(safe-area-inset-bottom,0px));left:8px;right:8px;width:auto;
+  gap:5px;padding:7px
+ }
+ .mobile-v2 .attack-row button{min-height:42px}
+ .mobile-v2 .systems-row-mobile button{min-height:34px}
+ .mobile-v2 .mobile-throttle button{min-height:34px}
+ .mobile-v2 .utility-row button{min-height:29px}
+ .mobile-v2 .flight-touch-area{
+  width:100%;bottom:calc(170px + env(safe-area-inset-bottom,0px));height:min(23vh,185px)
+ }
+ .mobile-v2 .floating-stick{left:37%;top:53%;width:99px;height:99px}
+ .mobile-v2 .rudder-pedals{
+  bottom:calc(172px + env(safe-area-inset-bottom,0px));
+  left:50%;transform:translateX(-50%);gap:5px
+ }
+ .mobile-v2 .rudder-pedals button{height:30px;min-width:70px}
+ .mobile-v2 .flight-control-caption{display:none}
+ .hud.compact.radar-open .left-column{top:145px;left:9px}
+ .toast,.hud.compact ~ .toast{top:147px;max-width:51vw}
+}
+@media(max-width:980px) and (orientation:landscape) and (max-height:440px){
+ .hud.compact .heading-tape{top:9px}
+ .hud.compact .flight-data{top:7px}
+ .hud.compact .mini-status{top:8px}
+ .hud.compact .compact-contact{top:49px}
+ .hud.compact .attitude{top:47%;width:200px;height:170px}
+ .mobile-v2 .mobile-console{gap:4px;padding:6px}
+ .mobile-v2 .attack-row button{min-height:36px}
+ .mobile-v2 .systems-row-mobile button{min-height:30px}
+ .mobile-v2 .mobile-throttle button{min-height:31px}
+ .mobile-v2 .utility-row button{min-height:27px}
+ .mobile-v2 .flight-touch-area{width:42vw;height:56vh}
+ .mobile-v2 .rudder-pedals button{min-width:73px;height:30px}
+ .hud.compact.radar-open .left-column{top:74px}
+ .toast,.hud.compact ~ .toast{top:77px}
+}
+@media(min-width:981px){
+ .hud.compact.radar-open .radar-panel{display:none}
+}
+
+/* Expanded instruments keep a tiny target readout on mobile as well. */
+@media(max-width:980px), (pointer:coarse){
+ .hud:not(.compact) ~ .mobile .mobile-contact{
+  display:flex;position:absolute;right:0;bottom:calc(100% + 5px);
+  border:1px solid rgba(148,231,197,.22);border-radius:4px;
+  background:rgba(5,22,30,.63);padding:7px 9px;
+ }
+}

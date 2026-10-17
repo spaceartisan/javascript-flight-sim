@@ -15,3 +15,29 @@ jobs:
         with:
           node-version: '22'
       - run: npm test
+
+  browser-smoke:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install lightweight headless browser driver
+        run: npm install --no-save playwright@1.56.1
+      - name: Run real desktop and phone-sized browser controls
+        run: |
+          python3 -m http.server 8080 --bind 127.0.0.1 > /tmp/aeronaut-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          node tests/browser-smoke.mjs
+      - name: Save real browser screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aeronaut-controls-browser-qa
+          path: test-results/*.png
+          if-no-files-found: ignore
+          retention-days: 14

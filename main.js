@@ -137,6 +137,8 @@ function togglePause(forced){
  if(!flight.started)return;
  const next=typeof forced==='boolean'?forced:!flight.paused;
  flight.paused=next;keys.clear();controlUI.resetTransient();
+ // Pause state must display synchronously, even on a slow mobile GPU frame.
+ $('pauseScreen').classList.toggle('hidden',!next);
  if(!next)accumulator=0;
  notify(next?'SIMULATION PAUSED':'SIMULATION RESUMED');
 }

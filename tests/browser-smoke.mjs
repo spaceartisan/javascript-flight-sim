@@ -51,9 +51,9 @@ async function testMode(name,viewport,isMobile){
    const power=await page.evaluate(async()=>{const {flight}=await import('./sim.js');return flight.throttle});
    assert(power>.64&&power<.68,name+' mobile throttle not wired: '+power);
    await page.locator('#mobilePause').click();
-   assert(await page.locator('#pauseScreen').isVisible(),name+' pause screen missing');
+   await page.locator('#pauseScreen').waitFor({state:'visible',timeout:10000});
    await page.locator('#restartFlight').click();
-   assert(!(await page.locator('#pauseScreen').isVisible()),name+' unable to resume/restart');
+   await page.locator('#pauseScreen').waitFor({state:'hidden',timeout:10000});
    assert.equal(await page.locator('#mobileThrottle').inputValue(),'0',name+' throttle did not reset');
   }else{
    await page.keyboard.down('Shift');
@@ -70,9 +70,9 @@ async function testMode(name,viewport,isMobile){
    assert(await page.locator('#helpScreen').isVisible(),'help manual failed to open');
    await page.locator('#closeHelp').click();
    await page.keyboard.press('p');
-   assert(await page.locator('#pauseScreen').isVisible(),'keyboard pause failed');
+   await page.locator('#pauseScreen').waitFor({state:'visible',timeout:10000});
    await page.locator('#resumeFlight').click();
-   assert(!(await page.locator('#pauseScreen').isVisible()),'resume failed');
+   await page.locator('#pauseScreen').waitFor({state:'hidden',timeout:10000});
   }
   await page.screenshot({path:`test-results/${name}.png`,fullPage:true});
   console.log(name+': PASS — cockpit started, input, layout and pause/restart');

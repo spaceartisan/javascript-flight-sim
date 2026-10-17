@@ -81,7 +81,7 @@ export function installControlUI({flight,keys,fireMissile,selectTarget,toggleGea
  $('mobileView').addEventListener('click',cycleView);
  $('mobilePause').addEventListener('click',()=>togglePause());
  $('resumeFlight').addEventListener('click',()=>togglePause(false));
- $('restartFlight').addEventListener('click',()=>{restart();togglePause(false);notify('NEW SORTIE — READY')});
+ $('restartFlight').addEventListener('click',()=>{restart();togglePause(false);syncThrottle(true);notify('NEW SORTIE — READY')});
  $('pauseHelp').addEventListener('click',openHelp);
  $('mobileFullscreen').addEventListener('click',async()=>{
   try{

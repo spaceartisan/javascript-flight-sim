@@ -222,3 +222,6 @@
 
 /* The help manual must sit above the pause scrim when opened from Pause. */
 #helpScreen:not(.hidden){z-index:14}
+
+/* Startup must remain tappable: mobile controls mount after the intro in DOM order. */
+#startScreen{z-index:10}

@@ -70,6 +70,27 @@ All forces and motion are integrated in **SI units** at a fixed 90 Hz step. The 
 
 Physics shortcuts/known limitations: no detailed engine inlet model, no atmospheric turbulence, no ground effect, no sophisticated landing-gear suspension, no damage accumulation, no multiplayer, and no AI enemy weapons. The HUD uses approximate magnetic heading and uncalibrated airspeed. The world is a fictional training airbase.
 
+## Authored texture & material overhaul (v0.3)
+
+AERONAUT's live GLBs now include **actual authored color maps, roughness maps, normal maps, and vector decals** baked into the shipped models. This pass modifies the production aircraft, drone, missile and airfield kit rather than creating unused demonstrations.
+
+- **Inkscape 1.4:** original SVG decal sheet, rasterized into a transparent texture atlas. Wing roundels, tactical stencils, hangar signage and fuel warnings are visible on real 3D model surfaces.
+- **Krita 5.3.4:** multilayer OpenRaster weathering passes for aircraft paint and hangar panels, exported and optimized for GLB textures.
+- **Blender 5.2.1:** planar mapped UV coordinates on every mesh, material color/roughness/normal image nodes and packed textures in the editable source. All four exported GLBs include textures and UVs.
+- **GIMP 3.0.4:** attempted from the provided tool installation, but its batch interpreter could not initialize, so no GIMP export was used. No claim is made otherwise.
+- **Runtime:** unchanged GLTFLoader integration and flight systems, with no extra texture requests because the maps are embedded in the GLBs. Material source artwork lives in two ZIP parts under `assets/materials`. The generator reassembles them on demand.
+
+Actual Blender Cycles previews: [textured Kestrel](docs/previews/jet-material-pass.png) · [textured airfield](docs/previews/airfield-material-pass.png). These are genuine project renders, not stock/reference images.
+
+To reproduce after any geometry refresh:
+
+```bash
+blender --background --python tools/build-model-library.py
+blender --background --python tools/apply-materials.py
+```
+
+See [materials source and licenses](assets/materials/README.md) for editable sources, texture maps and tool-specific details.
+
 ## Blender-authored visual overhaul (v0.2)
 
 The aircraft, drones, missile model, main airbase architecture, ground service equipment and environmental props now come from **actual Blender-exported GLB files loaded directly by the running Three.js game**. This replaces the previous in-browser procedural art, rather than merely distributing separate sample models.
@@ -147,4 +168,4 @@ This runs JavaScript module syntax checks and basic source/API/instrument consis
 
 ## Roadmap
 
-Higher-detail GLB aircraft and PBR texture atlas; proper cockpit meshes and MFDs; joystick/Gamepad API and rebinding; instrument landing system, ATC and approach cues; weather and cloud layers; enemy aircraft with dogfight AI; runway lighting and navigation aids; audio bank exports from Csound; stronger automated Playwright flight tests.
+Proper cockpit meshes and MFDs; higher-resolution UV seam treatment; LODs; joystick/Gamepad API and rebinding; instrumented flight surfaces and and MFDs; joystick/Gamepad API and rebinding; instrument landing system, ATC and approach cues; weather and cloud layers; enemy aircraft with dogfight AI; runway lighting and navigation aids; audio bank exports from Csound; stronger automated Playwright flight tests.

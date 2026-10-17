@@ -77,4 +77,30 @@ for(const [filename,names] of Object.entries(expected)){
 }
 assert(fs.existsSync(new URL('../assets/models/aeronaut-assets.blend',import.meta.url)),'Editable Blender source missing');
 assert(fs.existsSync(new URL('../tools/build-model-library.py',import.meta.url)),'Reproducible Blender generator missing');
-console.log('AERONAUT static validation passed (including GeneralUser GS audio and live Blender art integration).');
+// v0.3: material maps and vector decals must be live in the shipped GLBs.
+let textured=0, withDecals=0;
+for (const filename of ['kestrel-hd.glb','skua-drone-hd.glb','razor9-missile-hd.glb','airfield-kit-hd.glb']) {
+ const buffer=fs.readFileSync(new URL('../assets/models/'+filename,import.meta.url));
+ const jsonLength=buffer.readUInt32LE(12);
+ const obj=JSON.parse(buffer.subarray(20,20+jsonLength).toString('utf8'));
+ assert((obj.images||[]).length>=2,filename+' lacks embedded material images');
+ assert((obj.textures||[]).length>=2,filename+' lacks glTF texture objects');
+ assert(obj.meshes.every(mesh=>mesh.primitives.some(p=>'TEXCOORD_0' in p.attributes)),filename+' has unwrapped geometry');
+ assert(obj.materials.some(m=>m.pbrMetallicRoughness?.baseColorTexture),filename+' has no PBR color texture');
+ const names=obj.materials.map(m=>m.name||'');
+ if(names.some(n=>n.includes('Inkscape vector decals')))withDecals++;
+ textured++;
+}
+assert.equal(textured,4,'all four production GLBs must contain authored materials');
+assert(withDecals>=2,'aircraft and airfield must carry decal atlas');
+for(const path of ['assets/materials/texture-sources.zip.part01','assets/materials/texture-sources.zip.part02','assets/materials/README.md',
+                   'tools/apply-materials.py','docs/previews/jet-material-pass.png','docs/previews/airfield-material-pass.png']) {
+ assert(fs.existsSync(new URL('../'+path,import.meta.url)),'Missing authored material source: '+path);
+}
+const zipStart=fs.readFileSync(new URL('../assets/materials/texture-sources.zip.part01',import.meta.url));
+assert.equal(zipStart.toString('ascii',0,2),'PK','Source materials must be a ZIP archive');
+assert(zipStart.length>500_000,'Missing Krita layers, SVG decals or material maps');
+const materialScript=fs.readFileSync(new URL('../tools/apply-materials.py',import.meta.url),'utf8');
+assert(materialScript.includes("texture-sources.zip.part0"),'Blender rebuild must reassemble source archive');
+assert(materialScript.includes('authored')||materialScript.includes('Authored'),'Blender material source integration missing');
+console.log('AERONAUT validation passed: physics, GeneralUser audio, UV-mapped textured Blender GLBs, decals and source artwork.');

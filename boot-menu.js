@@ -91,9 +91,10 @@ export function installBootMenu({onStart,onManual,sound,started}){
   if(e.code==='ArrowDown'||e.code==='KeyS'){select(selected+1,true);e.preventDefault()}
   else if(e.code==='ArrowUp'||e.code==='KeyW'){select(selected-1,true);e.preventDefault()}
   else if(e.code==='Enter'||e.code==='Space'){
-   e.preventDefault();
-   // Native button Enter behavior would otherwise fire a second click.
+   // Menu buttons already support native Enter/Space click activation.
+   // Do NOT prevent their default behavior or the selected menu stops working.
    if(e.target.tagName==='BUTTON'&&commands.includes(e.target.id))return;
+   e.preventDefault();
    confirm();
   }
  });

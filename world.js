@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {loadBlenderModels} from './models.js';
+import {createTerrainMaterial} from './terrain-material.js';
 export {THREE};
 export const V=(x=0,y=0,z=0)=>new THREE.Vector3(x,y,z);
 export const UP=V(0,1,0), FWD=V(0,0,-1);
@@ -46,7 +47,9 @@ else if(h>250)c.setHSL(.23,.14,THREE.MathUtils.lerp(.34,.48,n));
 else c.setHSL(.28,THREE.MathUtils.lerp(.18,.29,n),THREE.MathUtils.lerp(.26,.38,n));
 colors.push(c.r,c.g,c.b)}
 terrainGeo.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));terrainGeo.computeVertexNormals();
-const terrain=new THREE.Mesh(terrainGeo,new THREE.MeshStandardMaterial({vertexColors:true,roughness:1}));
+// Heightfield remains physics-driven; the surface is authored ground material.
+const terrain=new THREE.Mesh(terrainGeo,createTerrainMaterial());
+terrain.name='Sierra / slope-height terrain with authored PBR ground';
 terrain.receiveShadow=true;scene.add(terrain);
 const sea=new THREE.Mesh(new THREE.PlaneGeometry(30000,36000),new THREE.MeshPhysicalMaterial({color:'#427789',metalness:.23,roughness:.35,transparent:true,opacity:.94}));
 sea.rotation.x=-Math.PI/2;sea.position.set(-22000,-18,0);scene.add(sea);

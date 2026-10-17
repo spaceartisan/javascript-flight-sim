@@ -107,6 +107,19 @@ The airfield uses a 12-module Blender kit — detailed hangars, an octagonal con
 
 Shaders and realistic environment can still be improved further (texture atlases, ground clutter LOD, cockpit interior). The model swap preserves physics and gameplay.
 
+## Terrain material overhaul (v0.4)
+
+The **real in-game mountain heightfield** now uses a slope/height-aware `MeshStandardMaterial` shader instead of monochrome vertex tinting. Three authored surface sets — **dry compacted soil, sparse ochre scrub, and fractured rocky outcrops** — include tiling albedo maps and combined normal/roughness maps. The textures are generated reproducibly by `tools/generate-terrain-textures.py` and are stored in `assets/terrain/` as optimized WebP assets.
+
+- **Rocky slopes and ridges:** angle-of-slope and elevation control physically weathered bedrock distribution; rock uses triplanar projection on steep faces to avoid badly stretched textures.
+- **Scrubland:** green-grey, faded-ochre grass texture replaces uniform flat green; concentration varies by moisture/macro noise and diminishes above the tree line.
+- **Disturbed airport fringe:** compacted dirt becomes more prominent around the operational airbase, producing a gradual soil transition without changing runway physics.
+- **Two-scale procedural variation:** fine repeating detail blended with wide geographic color variation reduces obvious tiling from cruise altitude.
+- **PBR response:** normal/roughness support actual Three.js lighting, shadows and distance fog.
+- **GitHub Pages friendly:** six 512px maps totaling well under 1MB, with no runtime dependency beyond the existing Three.js CDN.
+
+Run `python3 tools/generate-terrain-textures.py` (requires numpy, scipy and Pillow) to regenerate the texture maps. The flight model's `height(x,z)` function, 90 Hz physics and obstacle geometry are unchanged. This is a material/terrain-art pass rather than a terrain shape/airfield redesign.
+
 ## Project structure
 
 - `index.html` — flight deck UI, help/manual, mobile controls and import map.

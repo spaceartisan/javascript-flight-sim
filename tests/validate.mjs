@@ -103,4 +103,28 @@ assert(zipStart.length>500_000,'Missing Krita layers, SVG decals or material map
 const materialScript=fs.readFileSync(new URL('../tools/apply-materials.py',import.meta.url),'utf8');
 assert(materialScript.includes("texture-sources.zip.part0"),'Blender rebuild must reassemble source archive');
 assert(materialScript.includes('authored')||materialScript.includes('Authored'),'Blender material source integration missing');
-console.log('AERONAUT validation passed: physics, GeneralUser audio, UV-mapped textured Blender GLBs, decals and source artwork.');
+// v0.4 terrain: shipped maps must exist, decode as WebP, and drive the actual heightfield.
+const terrainMaterial=read('terrain-material.js');
+assert(world.includes("import {createTerrainMaterial} from './terrain-material.js'"),'world must import new terrain material');
+assert(world.includes('const terrain=new THREE.Mesh(terrainGeo,createTerrainMaterial())'),'procedural vertex tint still wired instead of geological material');
+for(const kind of ['dirt','scrub','rock']){
+ for(const suffix of ['albedo','normal-roughness']){
+  const file='assets/terrain/'+kind+'-'+suffix+'.webp';
+  const bytes=fs.readFileSync(new URL('../'+file,import.meta.url));
+  assert.equal(bytes.toString('ascii',0,4),'RIFF','Invalid WebP header '+file);
+  assert.equal(bytes.toString('ascii',8,12),'WEBP','Invalid WebP format '+file);
+  assert(bytes.length>7000,'Terrain surface map unexpectedly small '+file);
+  assert(bytes.length<500000,'Terrain texture unexpectedly large for GitHub Pages '+file);
+  assert(terrainMaterial.includes("'"+kind+"'"),'Terrain material missing category '+kind);
+ }
+}
+for(const token of ['terrainMixWeights','sampleRock','smoothstep(.15,.48,slope)',
+                     'smoothstep(390.,1420.,p.y)','nearAirbase',
+                     'uTerrainRockColor','uTerrainScrubNR','uTerrainDirtNR',
+                     'roughnessFactor=clamp','normal=normalize',
+                     'groundFbm','MeshStandardMaterial']){
+ assert(terrainMaterial.includes(token),'Terrain shader missing feature '+token);
+}
+assert(fs.existsSync(new URL('../tools/generate-terrain-textures.py',import.meta.url)),
+ 'Terrain material source generator missing');
+console.log('AERONAUT validation passed: Blender assets, GeneralUser audio and geological height/slope blended PBR terrain textures.');
